@@ -13,15 +13,16 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#c1592d",
-          borderRadius: "8px",
-          color: "#fbf4e9",
-          fontSize: 15,
+          background: "#c4341c",
+          borderRadius: "9px",
+          color: "#fdf5ee",
+          fontSize: 12,
           fontWeight: 700,
+          letterSpacing: -0.5,
           fontFamily: "sans-serif",
         }}
       >
-        E&amp;A
+        VIP
       </div>
     ),
     { ...size }

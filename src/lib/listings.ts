@@ -70,6 +70,7 @@ export const listings: Listing[] = [
   {
     id: "264828",
     name: "All American Cottage",
+    city: "Wichita Falls",
     image: "/images/cottage2-a.jpg",
     images: [
       "/images/cottage2-a.jpg",

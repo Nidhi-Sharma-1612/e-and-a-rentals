@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import LegalLayout, { LegalSection } from "@/components/LegalLayout";
 
 export const metadata: Metadata = {
-  title: "Terms and Conditions | E&A Rentals",
+  title: "Terms and Conditions | Book VIP Homes",
   description:
-    "The terms that govern using the E&A Rentals website and booking a stay with us.",
+    "The terms that govern using the Book VIP Homes website and booking a stay with us.",
 };
 
 export default function TermsPage() {
@@ -57,7 +57,7 @@ export default function TermsPage() {
       <LegalSection heading="Limitation of liability">
         <p>
           We do our best to keep our homes safe, clean, and accurately
-          described. To the extent permitted by law, E&amp;A Rentals is not
+          described. To the extent permitted by law, Book VIP Homes is not
           liable for indirect, incidental, or consequential damages arising
           from your stay or your use of this website. Nothing in these terms
           limits liability that cannot be limited under applicable law.
@@ -67,7 +67,7 @@ export default function TermsPage() {
       <LegalSection heading="Website use">
         <p>
           The content on this site — including photos, listing descriptions,
-          and branding — belongs to E&amp;A Rentals and may not be copied or
+          and branding — belongs to Book VIP Homes and may not be copied or
           reused without permission.
         </p>
       </LegalSection>
@@ -83,10 +83,10 @@ export default function TermsPage() {
         <p>
           Questions about these terms? Email{" "}
           <a
-            href="mailto:eddie@eandarentals.com"
+            href="mailto:eddie@bookviphomes.com"
             className="font-semibold text-denim hover:text-denim-dark"
           >
-            eddie@eandarentals.com
+            eddie@bookviphomes.com
           </a>
           .
         </p>

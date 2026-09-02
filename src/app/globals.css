@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --color-cream: #fbf4e9;
-  --color-cream-2: #f3e6d3;
-  --color-card: #fffdf8;
-  --color-ink: #2b2118;
-  --color-ink-soft: #5b4c3e;
-  --color-muted: #75634b;
-  --color-wood: #c9a97c;
-  --color-terracotta: #c1592d;
-  --color-terracotta-dark: #9c4522;
-  --color-sage: #6b7a56;
-  --color-sage-dark: #52603f;
-  --color-denim: #466e93;
-  --color-denim-dark: #3c5f7f;
-  --color-gold: #e8b48a;
+  --color-cream: #fdfbf8;
+  --color-cream-2: #f2ede4;
+  --color-card: #ffffff;
+  --color-ink: #191521;
+  --color-ink-soft: #4a4152;
+  --color-muted: #685f72;
+  --color-wood: #e6dccb;
+  --color-terracotta: #9c3620;
+  --color-terracotta-dark: #7d2c1c;
+  --color-sage: #227c6f;
+  --color-sage-dark: #17564c;
+  --color-denim: #4a2545;
+  --color-denim-dark: #35192f;
+  --color-gold: #f4a531;
 }
 
 @theme inline {
@@ -33,8 +33,9 @@
   --color-denim-dark: var(--color-denim-dark);
   --color-gold: var(--color-gold);
 
-  --font-heading: var(--font-bitter);
-  --font-sans: var(--font-work-sans);
+  --font-heading: var(--font-fraunces);
+  --font-ui: var(--font-space-grotesk);
+  --font-sans: var(--font-jakarta);
 }
 
 body {
@@ -65,6 +66,39 @@ body {
   }
 }
 
+@keyframes fade-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-right {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 @keyframes bob {
   0%,
   100% {
@@ -72,6 +106,34 @@ body {
   }
   50% {
     transform: translateY(6px);
+  }
+}
+
+@keyframes blob-float {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  33% {
+    transform: translate(3%, -4%) rotate(8deg) scale(1.05);
+  }
+  66% {
+    transform: translate(-3%, 3%) rotate(-6deg) scale(0.97);
+  }
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
   }
 }
 
@@ -83,8 +145,32 @@ body {
   animation: fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+.animate-fade-scale {
+  animation: fade-scale 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-slide-left {
+  animation: slide-left 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-slide-right {
+  animation: slide-right 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 .animate-bob {
   animation: bob 2.2s ease-in-out infinite;
+}
+
+.animate-blob-float {
+  animation: blob-float 14s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 18s linear infinite;
+}
+
+.animate-marquee {
+  animation: marquee 26s linear infinite;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
@@ -120,10 +206,22 @@ select:focus-visible,
   top: 1rem;
 }
 
+/* Consistent, subtle color grade applied to every property photo so
+   images shot at different times/lighting read as one cohesive set. */
+.photo-grade {
+  filter: saturate(1.06) contrast(1.05) brightness(0.99) sepia(0.04);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-hero-zoom,
   .animate-fade-up,
-  .animate-bob {
+  .animate-fade-scale,
+  .animate-slide-left,
+  .animate-slide-right,
+  .animate-bob,
+  .animate-blob-float,
+  .animate-spin-slow,
+  .animate-marquee {
     animation: none;
   }
 }

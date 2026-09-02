@@ -27,7 +27,7 @@ export default function DesktopNav({ navLinks }: { navLinks: NavLink[] }) {
             key={link.label}
             href={link.href}
             aria-current={isActive ? "true" : undefined}
-            className={`text-sm font-semibold transition-colors ${
+            className={`font-ui text-sm font-semibold transition-colors ${
               isActive ? "text-terracotta-dark" : "text-ink hover:text-terracotta"
             }`}
           >

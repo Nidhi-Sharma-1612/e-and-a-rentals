@@ -3,8 +3,8 @@ import { Lock } from "lucide-react";
 import LegalLayout, { LegalSection } from "@/components/LegalLayout";
 
 export const metadata: Metadata = {
-  title: "Cookie Preferences | E&A Rentals",
-  description: "What cookies E&A Rentals uses on this website, and why.",
+  title: "Cookie Preferences | Book VIP Homes",
+  description: "What cookies Book VIP Homes uses on this website, and why.",
 };
 
 export default function CookiePreferencesPage() {
@@ -54,10 +54,10 @@ export default function CookiePreferencesPage() {
         <p>
           Questions about cookies on this site? Email{" "}
           <a
-            href="mailto:eddie@eandarentals.com"
+            href="mailto:eddie@bookviphomes.com"
             className="font-semibold text-denim hover:text-denim-dark"
           >
-            eddie@eandarentals.com
+            eddie@bookviphomes.com
           </a>
           .
         </p>

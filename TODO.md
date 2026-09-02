@@ -1,4 +1,4 @@
-# E&A Rentals — improvement backlog
+# Book VIP Homes — improvement backlog
 
 From a full homepage UI/UX/accessibility/code-quality audit. Grouped by
 priority. Check items off as they're done.

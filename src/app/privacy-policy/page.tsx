@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import LegalLayout, { LegalSection } from "@/components/LegalLayout";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | E&A Rentals",
+  title: "Privacy Policy | Book VIP Homes",
   description:
-    "How E&A Rentals collects, uses, and protects the information you share with us.",
+    "How Book VIP Homes collects, uses, and protects the information you share with us.",
 };
 
 export default function PrivacyPolicyPage() {
@@ -12,8 +12,9 @@ export default function PrivacyPolicyPage() {
     <LegalLayout title="Privacy Policy" updated="August 23, 2026">
       <LegalSection heading="Overview">
         <p>
-          E&amp;A Rentals (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or
-          &ldquo;our&rdquo;) operates this website to showcase our vacation
+          Book VIP Homes (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or
+          &ldquo;our&rdquo;), a Valencia Investment Properties company,
+          operates this website to showcase our vacation
           rental homes and let guests get in touch about a stay. This policy
           explains what information we collect when you use the site, how we
           use it, and the choices you have.
@@ -92,10 +93,10 @@ export default function PrivacyPolicyPage() {
         <p>
           Questions about this policy? Email{" "}
           <a
-            href="mailto:eddie@eandarentals.com"
+            href="mailto:eddie@bookviphomes.com"
             className="font-semibold text-denim hover:text-denim-dark"
           >
-            eddie@eandarentals.com
+            eddie@bookviphomes.com
           </a>
           .
         </p>

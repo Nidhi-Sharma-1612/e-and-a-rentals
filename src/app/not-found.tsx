@@ -24,7 +24,7 @@ export default function NotFound() {
             className="flex items-center gap-2 rounded-xl bg-terracotta px-6 py-3 text-sm font-bold text-card transition-colors hover:bg-terracotta-dark"
           >
             <ArrowLeft className="h-4 w-4" strokeWidth={2.2} />
-            Back to E&amp;A Rentals
+            Back to Book VIP Homes
           </Link>
         </div>
       </main>

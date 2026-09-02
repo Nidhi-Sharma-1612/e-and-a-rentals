@@ -1,10 +1,10 @@
 import { Wifi, ChefHat, Snowflake, WashingMachine, Waves, PawPrint, type LucideIcon } from "lucide-react";
 import Reveal from "./Reveal";
+import Highlight from "./Highlight";
 
 type Amenity = {
   icon: LucideIcon;
   label: string;
-  note?: string;
   accent: "terracotta" | "sage" | "denim";
 };
 
@@ -13,58 +13,59 @@ const amenities: Amenity[] = [
   { icon: ChefHat, label: "Full Kitchen", accent: "sage" },
   { icon: Snowflake, label: "Air Conditioning", accent: "denim" },
   { icon: WashingMachine, label: "Washer & Dryer", accent: "terracotta" },
-  { icon: Waves, label: "Swimming Pool", note: "select homes", accent: "sage" },
-  { icon: PawPrint, label: "Pet Friendly", note: "select homes", accent: "denim" },
+  { icon: Waves, label: "Swimming Pool", accent: "sage" },
+  { icon: PawPrint, label: "Pet Friendly", accent: "denim" },
 ];
 
 const accentClasses = {
-  terracotta: { bg: "bg-terracotta/12", icon: "text-terracotta" },
-  sage: { bg: "bg-sage/12", icon: "text-sage" },
-  denim: { bg: "bg-denim/12", icon: "text-denim" },
+  terracotta: { icon: "text-terracotta", bg: "bg-terracotta/10" },
+  sage: { icon: "text-sage", bg: "bg-sage/10" },
+  denim: { icon: "text-denim", bg: "bg-denim/10" },
 };
 
 export default function Amenities() {
   return (
     <section
       id="amenities"
-      className="scroll-mt-16 bg-cream-2 px-5 py-14 md:scroll-mt-21 md:px-16 md:py-20"
+      className="relative scroll-mt-16 overflow-hidden bg-cream px-5 py-16 md:scroll-mt-21 md:px-16 md:py-24"
     >
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 opacity-[0.35] bg-[radial-gradient(var(--color-wood)_1px,transparent_1px)] bg-size-[22px_22px]"
+      />
 
-      <div className="mx-auto flex max-w-5xl flex-col gap-9 md:gap-12">
+      <div className="relative mx-auto flex max-w-5xl flex-col gap-12 md:gap-16">
         <Reveal className="mx-auto flex max-w-xl flex-col items-center gap-2.5 text-center md:gap-3">
-          <span className="text-xs font-bold uppercase tracking-[0.15em] text-terracotta-dark md:tracking-[0.2em]">
+          <span className="font-ui text-xs font-bold uppercase tracking-[0.15em] text-sage-dark md:tracking-[0.2em]">
             What&apos;s included
           </span>
           <h2 className="font-heading text-[27px] font-bold md:text-4xl">
-            The comforts of home, every time.
+            The comforts of <Highlight>home</Highlight>, every time.
           </h2>
           <p className="text-[14.5px] leading-relaxed text-ink-soft md:text-base">
-            Every E&amp;A home comes stocked with the essentials — plus a few
+            Every VIP home comes stocked with the essentials — plus a few
             extras at select properties.
           </p>
         </Reveal>
 
-        <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:gap-8">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-5">
           {amenities.map((amenity, index) => {
-            const { bg, icon } = accentClasses[amenity.accent];
+            const accent = accentClasses[amenity.accent];
             return (
-              <Reveal key={amenity.label} style={{ transitionDelay: `${index * 70}ms` }}>
-                <div className="group flex flex-col items-center gap-3 rounded-2xl border border-wood/30 bg-card px-4 py-7 text-center shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-wood/50 hover:shadow-md md:px-6">
+              <Reveal
+                key={amenity.label}
+                variant="scale"
+                style={{ transitionDelay: `${index * 70}ms` }}
+              >
+                <div className="group flex h-full flex-col items-center gap-3 rounded-tl-2xl rounded-br-2xl rounded-tr-md rounded-bl-md border border-wood/30 bg-card px-4 py-7 text-center shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(26,22,17,0.1)]">
                   <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-full transition-transform duration-300 ease-out group-hover:scale-110 ${bg}`}
+                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${accent.bg} transition-transform duration-300 ease-out group-hover:-translate-y-0.5`}
                   >
-                    <amenity.icon className={`h-5 w-5 ${icon}`} strokeWidth={2} />
+                    <amenity.icon className={`h-5.5 w-5.5 ${accent.icon}`} strokeWidth={1.8} />
                   </div>
-                  <div className="flex flex-col gap-0.5">
-                    <span className="font-heading text-[15px] font-semibold md:text-lg">
-                      {amenity.label}
-                    </span>
-                    {amenity.note && (
-                      <span className="mt-0.5 inline-flex w-fit items-center self-center rounded-full border border-wood/40 bg-cream-2 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-ink-soft">
-                        {amenity.note}
-                      </span>
-                    )}
-                  </div>
+                  <span className="font-heading text-[14.5px] font-semibold leading-tight md:text-base">
+                    {amenity.label}
+                  </span>
                 </div>
               </Reveal>
             );

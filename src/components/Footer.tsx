@@ -2,7 +2,6 @@ import Image from "next/image";
 import { Home, Mail } from "lucide-react";
 import Reveal from "./Reveal";
 import BackToTop from "./BackToTop";
-import { averageRating, listings } from "@/lib/listings";
 
 function FacebookIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -14,7 +13,13 @@ function FacebookIcon(props: React.SVGProps<SVGSVGElement>) {
 
 function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} {...props}>
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      {...props}
+    >
       <rect x="3" y="3" width="18" height="18" rx="5" />
       <circle cx="12" cy="12" r="4" />
       <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
@@ -45,31 +50,38 @@ const socialLinks = [
 export default function Footer() {
   return (
     <footer className="relative mt-auto overflow-hidden bg-ink text-cream">
-      <svg
-        className="absolute inset-x-0 top-0 h-10 w-full text-cream-2 md:h-16"
-        viewBox="0 0 1440 100"
-        preserveAspectRatio="none"
+      <div
         aria-hidden="true"
-      >
-        <path
-          d="M0,60 C240,10 480,100 720,80 C960,60 1200,10 1440,50 L1440,0 L0,0 Z"
-          fill="currentColor"
-        />
-      </svg>
+        className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(var(--color-cream)_1px,transparent_1px)] bg-size-[24px_24px]"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-terracotta/10 blur-3xl"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute -right-24 top-1/3 h-72 w-72 rounded-full bg-sage/10 blur-3xl"
+      />
 
-      <Reveal className="mx-auto flex max-w-[1312px] flex-col gap-10 px-5 pb-6 pt-16 md:gap-12 md:px-16 md:pb-8 md:pt-20">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.3fr_1fr_1fr_1fr] md:gap-8">
+      <Reveal className="relative mx-auto flex max-w-[1312px] flex-col gap-10 px-5 pb-6 pt-14 md:gap-12 md:px-16 md:pb-8 md:pt-16">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:gap-8">
           <div className="flex max-w-xs flex-col gap-4">
             <div className="flex items-center gap-2">
-              <Home className="h-5 w-5 text-gold" strokeWidth={1.8} />
-              <span className="font-heading text-lg font-bold">E&amp;A Rentals</span>
+              <Home className="h-5 w-5 shrink-0 text-terracotta" strokeWidth={1.8} />
+              <span className="flex flex-col leading-tight">
+                <span className="font-heading text-lg font-bold uppercase tracking-wide">
+                  Book VIP Homes
+                </span>
+                <span className="text-[11px] text-cream/55">
+                  by Valencia Investment Properties
+                </span>
+              </span>
             </div>
-            <p className="text-[13.5px] leading-relaxed text-cream/65">
-              All-American homes, all-American hospitality.
+            <p className="text-[13px] leading-relaxed text-cream/60">
+              Furnished, direct-booking homes across Texas — with a real host
+              who picks up the phone.
             </p>
-            <p className="text-[12.5px] font-semibold text-gold">
-              {averageRating}★ average · {listings.length} homes across Texas
-            </p>
+
             <div className="flex items-center gap-2.5 pt-1">
               {socialLinks.map(({ label, href, icon: Icon }) => (
                 <a
@@ -92,26 +104,22 @@ export default function Footer() {
               Get in touch
             </span>
             <a
-              href="mailto:eddie@eandarentals.com"
+              href="mailto:eddie@bookviphomes.com"
               className="flex items-center gap-1.5 text-sm text-cream/85 transition-all hover:translate-x-0.5 hover:text-cream"
             >
               <Mail className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
-              eddie@eandarentals.com
+              eddie@bookviphomes.com
             </a>
           </div>
         </div>
 
         <div className="h-px bg-cream/15" />
 
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-col gap-1.5 md:flex-row md:items-center md:gap-6">
-            <span className="text-[12.5px] text-cream/55">
-              © 2026 E&amp;A Rentals. All rights reserved.
-            </span>
-            <span className="text-[12.5px] text-cream/55">
-              Handpicked homes, hosted personally.
-            </span>
-          </div>
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <span className="text-[12.5px] text-cream/55">
+            © 2026 Book VIP Homes, a Valencia Investment Properties company. All
+            rights reserved.
+          </span>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <span className="flex items-center gap-1.5 text-[12.5px] text-cream/55">
               Design and developed by

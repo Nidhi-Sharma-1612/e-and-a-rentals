@@ -39,13 +39,13 @@ export default function PhotoGallery({
 
   return (
     <>
-      <div className="grid grid-cols-4 grid-rows-2 gap-2 overflow-hidden rounded-2xl md:h-[420px]">
+      <div className="grid grid-cols-4 grid-rows-2 gap-2 overflow-hidden rounded-tl-4xl rounded-br-4xl rounded-tr-md rounded-bl-md border border-wood/30 md:h-[420px]">
         <button
           type="button"
           onClick={() => openAt(0)}
           className="relative col-span-4 row-span-2 h-64 md:col-span-2 md:h-full"
         >
-          <Image src={main} alt={alt} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" priority />
+          <Image src={main} alt={alt} fill sizes="(min-width: 768px) 50vw, 100vw" className="photo-grade object-cover" priority />
         </button>
         {rest.map((src, i) => (
           <button
@@ -54,7 +54,7 @@ export default function PhotoGallery({
             onClick={() => openAt(i + 1)}
             className="relative col-span-1 row-span-1 hidden h-full md:block"
           >
-            <Image src={src} alt={`${alt} — photo ${i + 2}`} fill sizes="25vw" className="object-cover" />
+            <Image src={src} alt={`${alt} — photo ${i + 2}`} fill sizes="25vw" className="photo-grade object-cover" />
             {i === rest.length - 1 && images.length > 5 && (
               <div className="absolute inset-0 flex items-center justify-center bg-ink/50 text-sm font-bold text-cream">
                 +{images.length - 5} more

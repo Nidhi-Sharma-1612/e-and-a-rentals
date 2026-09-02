@@ -1,23 +1,30 @@
 import type { Metadata } from "next";
-import { Bitter, Work_Sans } from "next/font/google";
+import { Fraunces, Space_Grotesk, Plus_Jakarta_Sans } from "next/font/google";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 import "./globals.css";
 
-const bitter = Bitter({
-  variable: "--font-bitter",
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  style: ["normal", "italic"],
+});
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
   weight: ["500", "600", "700"],
 });
 
-const workSans = Work_Sans({
-  variable: "--font-work-sans",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
-const title = "E&A Rentals | All-American cottages, ready for your crew";
+const title = "Book VIP Homes | Book Direct. Stay VIP.";
 const description =
-  "Family-run, pet-friendly vacation homes across the Southwest. Three and four bedroom cottages with room for everybody, and a real host who picks up the phone.";
+  "Furnished, direct-booking rental homes by Valencia Investment Properties. Pet-friendly, three and four bedroom homes across Texas, with a real host who picks up the phone.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -51,7 +58,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${bitter.variable} ${workSans.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${spaceGrotesk.variable} ${jakarta.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
         <a href="#main-content" className="skip-link">

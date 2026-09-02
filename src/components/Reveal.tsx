@@ -2,14 +2,23 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
+const variants = {
+  up: { hidden: "translate-y-6 opacity-0", shown: "translate-y-0 opacity-100" },
+  scale: { hidden: "scale-95 opacity-0", shown: "scale-100 opacity-100" },
+  left: { hidden: "translate-x-8 opacity-0", shown: "translate-x-0 opacity-100" },
+  right: { hidden: "-translate-x-8 opacity-0", shown: "translate-x-0 opacity-100" },
+};
+
 export default function Reveal({
   children,
   className = "",
   style,
+  variant = "up",
 }: {
   children: ReactNode;
   className?: string;
   style?: CSSProperties;
+  variant?: keyof typeof variants;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   // Default to mounted=false so SSR/no-JS output is always fully visible —
@@ -42,14 +51,13 @@ export default function Reveal({
   }, []);
 
   const show = !hasMounted || visible;
+  const v = variants[variant];
 
   return (
     <div
       ref={ref}
       style={style}
-      className={`transition-all duration-700 ease-out ${
-        show ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
-      } ${className}`}
+      className={`transition-all duration-700 ease-out ${show ? v.shown : v.hidden} ${className}`}
     >
       {children}
     </div>

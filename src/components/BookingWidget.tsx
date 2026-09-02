@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   MapPin,
   Calendar as CalendarIcon,
@@ -12,7 +12,7 @@ import Calendar from "./Calendar";
 import GuestStepper from "./GuestStepper";
 import { useOutsideClose } from "@/hooks/useOutsideClose";
 import { useSearchFilter } from "./SearchFilterProvider";
-import { addDays, formatDisplayDate, generateSampleUnavailableDates, toISODate } from "@/lib/date";
+import { formatDisplayDate, generateSampleUnavailableDates, toISODate } from "@/lib/date";
 
 const today = toISODate(new Date());
 
@@ -31,23 +31,87 @@ export default function BookingWidget() {
   const [guests, setGuests] = useState(1);
 
   const [locationOpen, setLocationOpen] = useState(false);
-  const [checkInOpen, setCheckInOpen] = useState(false);
-  const [checkOutOpen, setCheckOutOpen] = useState(false);
+  const [datesOpen, setDatesOpen] = useState(false);
   const [guestPickerOpen, setGuestPickerOpen] = useState(false);
+  const [locationPlacement, setLocationPlacement] = useState<"down" | "up">("down");
+  const [datesPlacement, setDatesPlacement] = useState<"down" | "up">("down");
+  const [guestPlacement, setGuestPlacement] = useState<"down" | "up">("down");
+  const [locationMaxHeight, setLocationMaxHeight] = useState<number | undefined>(undefined);
+  const [datesMaxHeight, setDatesMaxHeight] = useState<number | undefined>(undefined);
+  const [guestMaxHeight, setGuestMaxHeight] = useState<number | undefined>(undefined);
 
   const locationRef = useRef<HTMLDivElement>(null);
-  const checkInRef = useRef<HTMLDivElement>(null);
-  const checkOutRef = useRef<HTMLDivElement>(null);
+  const datesRef = useRef<HTMLDivElement>(null);
   const guestPickerRef = useRef<HTMLDivElement>(null);
+  const locationPanelRef = useRef<HTMLDivElement>(null);
+  const datesPanelRef = useRef<HTMLDivElement>(null);
+  const guestPanelRef = useRef<HTMLDivElement>(null);
 
   const unavailable = useMemo(() => generateSampleUnavailableDates(), []);
 
   useOutsideClose([
     [locationRef, setLocationOpen],
-    [checkInRef, setCheckInOpen],
-    [checkOutRef, setCheckOutOpen],
+    [datesRef, setDatesOpen],
     [guestPickerRef, setGuestPickerOpen],
   ]);
+
+  // Picks which side of the trigger has more room, and caps the panel's
+  // height to whatever is actually available there — this is the part that
+  // guarantees no clipping even when the trigger sits somewhere scrolling
+  // can't help (e.g. a sticky ancestor).
+  function placementFor(
+    ref: React.RefObject<HTMLDivElement | null>,
+    estHeight: number
+  ): { placement: "down" | "up"; maxHeight: number | undefined } {
+    const rect = ref.current?.getBoundingClientRect();
+    if (!rect) return { placement: "down", maxHeight: undefined };
+    const margin = 16;
+    const spaceBelow = window.innerHeight - rect.bottom - margin;
+    const spaceAbove = rect.top - margin;
+    const placement = spaceBelow < estHeight && spaceAbove > spaceBelow ? "up" : "down";
+    const available = placement === "up" ? spaceAbove : spaceBelow;
+    const maxHeight = available < estHeight ? Math.max(0, available) : undefined;
+    return { placement, maxHeight };
+  }
+
+  function toggleLocation() {
+    if (!locationOpen) {
+      const { placement, maxHeight } = placementFor(locationRef, 220);
+      setLocationPlacement(placement);
+      setLocationMaxHeight(maxHeight);
+    }
+    setLocationOpen((v) => !v);
+  }
+
+  function toggleDates() {
+    if (!datesOpen) {
+      const { placement, maxHeight } = placementFor(datesRef, 420);
+      setDatesPlacement(placement);
+      setDatesMaxHeight(maxHeight);
+    }
+    setDatesOpen((v) => !v);
+  }
+
+  function toggleGuestPicker() {
+    if (!guestPickerOpen) {
+      const { placement, maxHeight } = placementFor(guestPickerRef, 110);
+      setGuestPlacement(placement);
+      setGuestMaxHeight(maxHeight);
+    }
+    setGuestPickerOpen((v) => !v);
+  }
+
+  // Even with flip-placement, a very short viewport may not fit the panel in
+  // either direction — nudge it fully into view so nothing is cut off.
+  useEffect(() => {
+    if (locationOpen) locationPanelRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [locationOpen]);
+  useEffect(() => {
+    if (datesOpen) datesPanelRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [datesOpen]);
+  useEffect(() => {
+    if (guestPickerOpen) guestPanelRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [guestPickerOpen]);
 
   function handleSearch() {
     const cityLabel = locations.find((loc) => loc.value === location)?.label ?? "";
@@ -59,15 +123,15 @@ export default function BookingWidget() {
   }
 
   return (
-    <div className="flex flex-col gap-3.5 rounded-2xl bg-card p-4.5 text-left shadow-[0_18px_40px_rgba(43,33,24,0.3)] md:gap-4 md:p-5.5">
+    <div className="flex flex-col gap-3 rounded-2xl bg-card p-4.5 text-left shadow-[0_18px_40px_rgba(43,33,24,0.3)] md:gap-4 md:p-5.5">
       <div className="flex flex-col divide-y divide-wood/40 md:flex-row md:items-stretch md:divide-y-0">
         {/* Location */}
-        <div ref={locationRef} className="relative flex-1" style={{ flexGrow: 1.2 }}>
+        <div ref={locationRef} className="relative flex-1" style={{ flexGrow: 1 }}>
           <button
             type="button"
-            onClick={() => setLocationOpen((v) => !v)}
+            onClick={toggleLocation}
             aria-expanded={locationOpen}
-            className="flex w-full flex-col gap-1 py-2 text-left md:px-5 md:py-1"
+            className="flex w-full flex-col gap-1 py-2.5 text-left md:px-5 md:py-1"
           >
             <span className="text-[11px] font-bold uppercase tracking-wide text-muted">
               Location
@@ -87,7 +151,13 @@ export default function BookingWidget() {
           </button>
 
           {locationOpen && (
-            <div className="absolute left-0 top-full z-50 mt-2 w-56 rounded-xl border border-wood/40 bg-card p-2 shadow-lg">
+            <div
+              ref={locationPanelRef}
+              style={{ maxHeight: locationMaxHeight ? `${locationMaxHeight}px` : undefined }}
+              className={`absolute left-0 z-50 w-56 overflow-y-auto rounded-xl border border-wood/40 bg-card p-2 shadow-lg ${
+                locationPlacement === "up" ? "bottom-full mb-2" : "top-full mt-2"
+              }`}
+            >
               {locations.map((loc) => (
                 <button
                   key={loc.value}
@@ -109,80 +179,74 @@ export default function BookingWidget() {
           )}
         </div>
 
-        {/* Check-in */}
-        <div ref={checkInRef} className="relative flex-1 md:border-l md:border-wood/40">
+        {/* Check-in / Check-out: two fields, one shared calendar */}
+        <div
+          ref={datesRef}
+          className="relative flex flex-1 divide-x divide-wood/40 md:border-l md:border-wood/40"
+          style={{ flexGrow: 1.6 }}
+        >
           <button
             type="button"
-            onClick={() => setCheckInOpen((v) => !v)}
-            className="flex w-full flex-col gap-1 py-2 text-left md:px-5 md:py-1"
+            onClick={toggleDates}
+            className="flex flex-1 flex-col gap-1 px-3 py-2.5 text-left md:px-5 md:py-1"
           >
             <span className="text-[11px] font-bold uppercase tracking-wide text-muted">
               Check-in
             </span>
             <span className="flex items-center gap-2">
               <CalendarIcon className="h-4 w-4 shrink-0 text-terracotta" strokeWidth={2} />
-              <span className="text-sm text-ink-soft md:text-[15px]">
+              <span className="truncate text-sm text-ink-soft md:text-[15px]">
                 {checkIn ? formatDisplayDate(checkIn) : "Add date"}
               </span>
             </span>
           </button>
 
-          {checkInOpen && (
-            <div className="absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2">
-              <Calendar
-                selected={checkIn}
-                minDate={today}
-                unavailable={unavailable}
-                onSelect={(iso) => {
-                  setCheckIn(iso);
-                  if (checkOut && checkOut <= iso) setCheckOut(null);
-                  setCheckInOpen(false);
-                }}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Check-out */}
-        <div ref={checkOutRef} className="relative flex-1 md:border-l md:border-wood/40">
           <button
             type="button"
-            onClick={() => setCheckOutOpen((v) => !v)}
-            className="flex w-full flex-col gap-1 py-2 text-left md:px-5 md:py-1"
+            onClick={toggleDates}
+            className="flex flex-1 flex-col gap-1 px-3 py-2.5 text-left md:px-5 md:py-1"
           >
             <span className="text-[11px] font-bold uppercase tracking-wide text-muted">
               Check-out
             </span>
             <span className="flex items-center gap-2">
               <CalendarIcon className="h-4 w-4 shrink-0 text-terracotta" strokeWidth={2} />
-              <span className="text-sm text-ink-soft md:text-[15px]">
+              <span className="truncate text-sm text-ink-soft md:text-[15px]">
                 {checkOut ? formatDisplayDate(checkOut) : "Add date"}
               </span>
             </span>
           </button>
 
-          {checkOutOpen && (
-            <div className="absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2">
+          {datesOpen && (
+            <div
+              ref={datesPanelRef}
+              className={`absolute left-1/2 z-50 -translate-x-1/2 ${
+                datesPlacement === "up" ? "bottom-full mb-2" : "top-full mt-2"
+              }`}
+            >
               <Calendar
-                selected={checkOut}
-                minDate={checkIn ? addDays(checkIn, 1) : today}
+                checkIn={checkIn}
+                checkOut={checkOut}
+                minDate={today}
                 unavailable={unavailable}
-                onSelect={(iso) => {
-                  setCheckOut(iso);
-                  setCheckOutOpen(false);
+                maxHeight={datesMaxHeight}
+                onChange={(next) => {
+                  setCheckIn(next.checkIn);
+                  setCheckOut(next.checkOut);
+                  if (next.checkIn && next.checkOut) setDatesOpen(false);
                 }}
               />
             </div>
           )}
         </div>
 
-        {/* Guests + search: share a row on every breakpoint */}
-        <div className="flex items-center gap-3 pt-3.5 md:contents md:pt-0">
-          <div ref={guestPickerRef} className="relative flex-1 md:border-l md:border-wood/40" style={{ flexGrow: 0.8 }}>
+        {/* Guests + search (desktop: shared row with an icon button) */}
+        <div className="flex items-center gap-3 md:contents">
+          <div ref={guestPickerRef} className="relative flex-1 md:grow-[0.8] md:border-l md:border-wood/40">
             <button
               type="button"
-              onClick={() => setGuestPickerOpen((v) => !v)}
-              className="flex w-full flex-col gap-1 py-2 text-left md:px-5 md:py-1"
+              onClick={toggleGuestPicker}
+              className="flex w-full flex-col gap-1 py-2.5 text-left md:px-5 md:py-1"
             >
               <span className="text-[11px] font-bold uppercase tracking-wide text-muted">
                 Guests
@@ -195,19 +259,39 @@ export default function BookingWidget() {
               </span>
             </button>
 
-            {guestPickerOpen && <GuestStepper guests={guests} setGuests={setGuests} />}
+            {guestPickerOpen && (
+              <GuestStepper
+                guests={guests}
+                setGuests={setGuests}
+                max={10}
+                widthClassName="w-full md:w-56"
+                placement={guestPlacement}
+                panelRef={guestPanelRef}
+                maxHeight={guestMaxHeight}
+              />
+            )}
           </div>
 
           <button
             type="button"
             onClick={handleSearch}
             aria-label="Search stays"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-terracotta text-card transition-colors hover:bg-terracotta-dark md:h-12 md:w-12 md:self-center"
+            className="hidden shrink-0 items-center justify-center rounded-full bg-terracotta text-card transition-colors hover:bg-terracotta-dark md:flex md:h-12 md:w-12 md:self-center"
           >
             <Search className="h-[18px] w-[18px]" strokeWidth={2.3} />
           </button>
         </div>
       </div>
+
+      {/* Mobile: full-width primary CTA instead of a small icon button */}
+      <button
+        type="button"
+        onClick={handleSearch}
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-terracotta py-3 text-sm font-bold text-card transition-colors hover:bg-terracotta-dark md:hidden"
+      >
+        <Search className="h-4 w-4" strokeWidth={2.3} />
+        Search stays
+      </button>
     </div>
   );
 }

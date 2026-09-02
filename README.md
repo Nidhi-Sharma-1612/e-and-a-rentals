@@ -1,8 +1,9 @@
-# E&A Rentals
+# Book VIP Homes
 
-Marketing and listings website for **E&A Rentals**, a family-run vacation
-rental business with pet-friendly cottages across Texas and the Southwest.
-Built with Next.js (App Router), TypeScript, and Tailwind CSS v4.
+Marketing and listings website for **Book VIP Homes**, the direct-booking
+furnished rental division of Valencia Investment Properties — pet-friendly
+homes across Texas, with more markets planned. Built with Next.js (App
+Router), TypeScript, and Tailwind CSS v4.
 
 ## Getting started
 

@@ -55,7 +55,7 @@ export default function MobileMenu({ navLinks }: { navLinks: NavLink[] }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-40 mt-2 w-64 rounded-2xl border border-wood/30 bg-card p-3 shadow-lg">
+        <div className="fixed inset-x-0 top-16 z-40 max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-wood/30 bg-card px-5 pb-5 pt-4 shadow-lg md:top-21">
           <nav className="flex flex-col">
             {navLinks.map((link) => {
               const id = sectionIdFromHref(link.href);
@@ -66,7 +66,7 @@ export default function MobileMenu({ navLinks }: { navLinks: NavLink[] }) {
                   href={link.href}
                   onClick={() => setOpen(false)}
                   aria-current={isActive ? "true" : undefined}
-                  className={`rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors hover:bg-cream-2 hover:text-terracotta ${
+                  className={`rounded-xl px-4 py-3.5 font-ui text-base font-semibold transition-colors hover:bg-cream-2 hover:text-terracotta ${
                     isActive ? "bg-cream-2 text-terracotta-dark" : "text-ink"
                   }`}
                 >
@@ -75,11 +75,11 @@ export default function MobileMenu({ navLinks }: { navLinks: NavLink[] }) {
               );
             })}
           </nav>
-          <div className="mt-2 border-t border-wood/25 pt-3">
+          <div className="mt-3 border-t border-wood/25 pt-4">
             <a
-              href="mailto:eddie@eandarentals.com"
+              href="mailto:eddie@bookviphomes.com"
               onClick={() => setOpen(false)}
-              className="flex items-center justify-center gap-2 rounded-lg bg-denim px-4 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-denim-dark"
+              className="flex items-center justify-center gap-2 rounded-xl bg-denim px-4 py-3.5 font-ui text-base font-semibold text-cream transition-colors hover:bg-denim-dark"
             >
               <Mail className="h-4 w-4" strokeWidth={2} />
               Contact

@@ -4,7 +4,8 @@ import About from "@/components/About";
 import Listings from "@/components/Listings";
 import Amenities from "@/components/Amenities";
 import Testimonials from "@/components/Testimonials";
-import CtaFaq from "@/components/CtaFaq";
+import Faq from "@/components/Faq";
+import Cta from "@/components/Cta";
 import Footer from "@/components/Footer";
 import { SearchFilterProvider } from "@/components/SearchFilterProvider";
 
@@ -20,7 +21,8 @@ export default function Home() {
         </SearchFilterProvider>
         <Amenities />
         <Testimonials />
-        <CtaFaq />
+        <Faq />
+        <Cta />
       </main>
       <Footer />
     </>
