@@ -1,6 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
     // The production host's /_next/image optimization route returns 503
     // (no `sharp` support in that environment). All images are already
