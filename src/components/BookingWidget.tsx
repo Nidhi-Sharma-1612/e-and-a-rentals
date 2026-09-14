@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   MapPin,
   Calendar as CalendarIcon,
@@ -11,21 +12,26 @@ import {
 import Calendar from "./Calendar";
 import GuestStepper from "./GuestStepper";
 import { useOutsideClose } from "@/hooks/useOutsideClose";
-import { useSearchFilter } from "./SearchFilterProvider";
-import { formatDisplayDate, generateSampleUnavailableDates, toISODate } from "@/lib/date";
+import { formatDisplayDate, toISODate } from "@/lib/date";
+import { getCities, type Listing } from "@/lib/listings";
 
 const today = toISODate(new Date());
 
-const locations = [
-  { value: "", label: "Any location" },
-  { value: "el-paso", label: "El Paso" },
-  { value: "wichita-falls", label: "Wichita Falls" },
-];
-
-export default function BookingWidget() {
-  const { applyFilter } = useSearchFilter();
+export default function BookingWidget({ listings }: { listings: Listing[] }) {
+  const router = useRouter();
+  const locations = [
+    { value: "", label: "Any location" },
+    ...getCities(listings).map((city) => ({ value: city, label: city })),
+  ];
+  const maxGuests = Math.max(1, ...listings.map((l) => l.guests));
 
   const [location, setLocation] = useState("");
+  // The lowest minimum-stay among homes the current location could match —
+  // no single listing is picked yet, so this is the most permissive bound
+  // that's still honest (a shorter stay wouldn't be bookable anywhere).
+  const relevantListings = location ? listings.filter((l) => l.city === location) : listings;
+  const minNightsValues = relevantListings.map((l) => l.minNights ?? 1);
+  const minNights = minNightsValues.length > 0 ? Math.min(...minNightsValues) : 1;
   const [checkIn, setCheckIn] = useState<string | null>(null);
   const [checkOut, setCheckOut] = useState<string | null>(null);
   const [guests, setGuests] = useState(1);
@@ -47,7 +53,23 @@ export default function BookingWidget() {
   const datesPanelRef = useRef<HTMLDivElement>(null);
   const guestPanelRef = useRef<HTMLDivElement>(null);
 
-  const unavailable = useMemo(() => generateSampleUnavailableDates(), []);
+  const [unavailable, setUnavailable] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/hostaway/calendar")
+      .then((res) => (res.ok ? res.json() : { unavailable: [] }))
+      .then((data: { unavailable: string[] }) => {
+        if (!cancelled) setUnavailable(new Set(data.unavailable));
+      })
+      .catch(() => {
+        // Stays empty (all days shown open) if the aggregate calendar
+        // request fails — better than blocking the search widget.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useOutsideClose([
     [locationRef, setLocationOpen],
@@ -114,12 +136,13 @@ export default function BookingWidget() {
   }, [guestPickerOpen]);
 
   function handleSearch() {
-    const cityLabel = locations.find((loc) => loc.value === location)?.label ?? "";
-    applyFilter({
-      location: cityLabel === "Any location" ? "" : cityLabel,
-      guests,
-    });
-    document.getElementById("listings")?.scrollIntoView({ behavior: "smooth" });
+    const params = new URLSearchParams();
+    if (location) params.set("location", location);
+    if (guests > 1) params.set("guests", String(guests));
+    if (checkIn) params.set("checkIn", checkIn);
+    if (checkOut) params.set("checkOut", checkOut);
+    const query = params.toString();
+    router.push(query ? `/properties?${query}` : "/properties");
   }
 
   return (
@@ -230,6 +253,7 @@ export default function BookingWidget() {
                 minDate={today}
                 unavailable={unavailable}
                 maxHeight={datesMaxHeight}
+                minNights={minNights}
                 onChange={(next) => {
                   setCheckIn(next.checkIn);
                   setCheckOut(next.checkOut);
@@ -263,7 +287,7 @@ export default function BookingWidget() {
               <GuestStepper
                 guests={guests}
                 setGuests={setGuests}
-                max={10}
+                max={maxGuests}
                 widthClassName="w-full md:w-56"
                 placement={guestPlacement}
                 panelRef={guestPanelRef}
@@ -282,6 +306,12 @@ export default function BookingWidget() {
           </button>
         </div>
       </div>
+
+      {minNights > 1 && (
+        <p className="text-center text-xs text-muted md:text-left">
+          {minNights}-night minimum{location ? ` in ${location}` : ""}
+        </p>
+      )}
 
       {/* Mobile: full-width primary CTA instead of a small icon button */}
       <button

@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
-import { listings } from "@/lib/listings";
+import { getListings } from "@/lib/listings";
 import { SITE_URL } from "@/lib/site";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const listings = await getListings();
   const listingRoutes: MetadataRoute.Sitemap = listings.map((listing) => ({
     url: `${SITE_URL}/listings/${listing.id}`,
     changeFrequency: "weekly",
@@ -24,6 +25,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: SITE_URL,
       changeFrequency: "weekly",
       priority: 1,
+    },
+    {
+      url: `${SITE_URL}/properties`,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/contact`,
+      changeFrequency: "yearly",
+      priority: 0.5,
     },
     ...listingRoutes,
     ...legalRoutes,

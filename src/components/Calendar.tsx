@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { toISODate } from "@/lib/date";
+import { addDays, toISODate } from "@/lib/date";
 
 const WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const MAX_MONTHS_AHEAD = 18;
@@ -14,6 +14,7 @@ type CalendarProps = {
   minDate: string;
   unavailable: Set<string>;
   maxHeight?: number;
+  minNights?: number;
 };
 
 export default function Calendar({
@@ -23,11 +24,16 @@ export default function Calendar({
   minDate,
   unavailable,
   maxHeight,
+  minNights = 1,
 }: CalendarProps) {
   const minMonth = startOfMonth(new Date(`${minDate}T00:00:00`));
+  // Some homes are blocked out for long stretches (an owner block, an
+  // extended-stay tenant, etc). Rather than open on the current month and
+  // force guests to click "next" blindly through a year of greyed-out
+  // days, jump straight to the first month that actually has something open.
   const initial = checkIn
     ? startOfMonth(new Date(`${checkIn}T00:00:00`))
-    : minMonth;
+    : (firstAvailableMonth(minMonth, minDate, unavailable, MAX_MONTHS_AHEAD) ?? minMonth);
 
   const [viewedMonth, setViewedMonth] = useState(initial);
   const today = toISODate(new Date());
@@ -55,6 +61,11 @@ export default function Calendar({
     }
     if (iso <= checkIn) {
       onChange({ checkIn: iso, checkOut: null });
+      return;
+    }
+    if (iso < addDays(checkIn, minNights)) {
+      // Too close to check-in to satisfy the minimum stay — ignore rather
+      // than let a click set an invalid range.
       return;
     }
     onChange({ checkIn, checkOut: iso });
@@ -108,7 +119,9 @@ export default function Calendar({
         {!checkIn
           ? "Select a check-in date"
           : !checkOut
-            ? "Select a check-out date"
+            ? minNights > 1
+              ? `Select a check-out date (${minNights} night minimum)`
+              : "Select a check-out date"
             : `${formatShort(checkIn)} – ${formatShort(checkOut)}`}
       </p>
 
@@ -125,7 +138,10 @@ export default function Calendar({
           const iso = toISODate(new Date(year, month, day));
           const isPast = iso < minDate;
           const isBlocked = unavailable.has(iso) && !isPast;
-          const isDisabled = isPast || isBlocked;
+          const isTooClose =
+            !!checkIn && !checkOut && !isPast && !isBlocked &&
+            iso > checkIn && iso < addDays(checkIn, minNights);
+          const isDisabled = isPast || isBlocked || isTooClose;
           const isCheckIn = iso === checkIn;
           const isCheckOut = iso === checkOut;
           const isInRange =
@@ -192,4 +208,22 @@ function formatShort(iso: string): string {
 
 function startOfMonth(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function firstAvailableMonth(
+  startMonth: Date,
+  minDate: string,
+  unavailable: Set<string>,
+  monthsAhead: number
+): Date | null {
+  for (let i = 0; i < monthsAhead; i++) {
+    const month = new Date(startMonth.getFullYear(), startMonth.getMonth() + i, 1);
+    const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+    for (let day = 1; day <= daysInMonth; day++) {
+      const iso = toISODate(new Date(month.getFullYear(), month.getMonth(), day));
+      if (iso < minDate) continue;
+      if (!unavailable.has(iso)) return month;
+    }
+  }
+  return null;
 }

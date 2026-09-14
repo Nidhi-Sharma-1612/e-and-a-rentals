@@ -7,22 +7,22 @@ import Testimonials from "@/components/Testimonials";
 import Faq from "@/components/Faq";
 import Cta from "@/components/Cta";
 import Footer from "@/components/Footer";
-import { SearchFilterProvider } from "@/components/SearchFilterProvider";
+import { getListings } from "@/lib/listings";
 
-export default function Home() {
+export default async function Home() {
+  const listings = await getListings();
+
   return (
     <>
       <Header />
       <main id="main-content">
-        <SearchFilterProvider>
-          <Hero />
-          <About />
-          <Listings />
-        </SearchFilterProvider>
-        <Amenities />
-        <Testimonials />
-        <Faq />
-        <Cta />
+        <Hero listings={listings} />
+        <About listings={listings} />
+        <Listings listings={listings} />
+        <Amenities listings={listings} />
+        <Testimonials listings={listings} />
+        <Faq listings={listings} />
+        <Cta listings={listings} />
       </main>
       <Footer />
     </>

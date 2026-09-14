@@ -30,7 +30,7 @@ function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
 const exploreLinks = [
   { label: "Home", href: "/" },
   { label: "About", href: "/#about" },
-  { label: "All listings", href: "/#listings" },
+  { label: "All listings", href: "/properties" },
   { label: "Amenities", href: "/#amenities" },
   { label: "Reviews", href: "/#testimonials" },
   { label: "FAQ", href: "/#faq" },

@@ -1,23 +1,12 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { Star, Users, BedDouble, Bath, ArrowRight, X, Sparkles, MapPin, PawPrint } from "lucide-react";
-import { listings, type Listing } from "@/lib/listings";
+import { Star, Users, BedDouble, Bath, ArrowRight, Sparkles, MapPin, PawPrint } from "lucide-react";
+import { type Listing } from "@/lib/listings";
 import Reveal from "./Reveal";
 import Highlight from "./Highlight";
-import { useSearchFilter } from "./SearchFilterProvider";
 
-export default function Listings() {
-  const { filter, clearFilter } = useSearchFilter();
-
-  const filtered = listings.filter((listing) => {
-    if (filter?.location && listing.city !== filter.location) return false;
-    if (filter?.guests && listing.guests < filter.guests) return false;
-    return true;
-  });
-
-  const [featured, ...rest] = filtered;
+export default function Listings({ listings }: { listings: Listing[] }) {
+  const [featured, ...rest] = listings;
 
   return (
     <section
@@ -42,36 +31,7 @@ export default function Listings() {
           </p>
         </Reveal>
 
-        {filter && (
-          <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-3 rounded-xl border border-wood/30 bg-card px-4 py-3 text-sm">
-            <span className="text-ink-soft">
-              Showing {filtered.length} of {listings.length} homes
-              {filter.location ? ` in ${filter.location}` : ""}
-              {filter.guests > 1 ? ` for ${filter.guests}+ guests` : ""}
-            </span>
-            <button
-              type="button"
-              onClick={clearFilter}
-              className="flex items-center gap-1 font-semibold text-denim hover:text-denim-dark"
-            >
-              <X className="h-3.5 w-3.5" strokeWidth={2.2} />
-              Clear filters
-            </button>
-          </div>
-        )}
-
-        {filtered.length === 0 ? (
-          <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 rounded-2xl border border-wood/30 bg-card py-14 text-center">
-            <p className="text-ink-soft">No homes match your search right now.</p>
-            <button
-              type="button"
-              onClick={clearFilter}
-              className="font-semibold text-denim hover:text-denim-dark"
-            >
-              Clear filters and see all homes
-            </button>
-          </div>
-        ) : (
+        {listings.length > 0 && (
           <div className="flex flex-col gap-6 md:gap-8">
             <Reveal>
               <FeaturedListingCard listing={featured} />
@@ -88,15 +48,23 @@ export default function Listings() {
             )}
           </div>
         )}
+
+        <Link
+          href="/properties"
+          className="mx-auto flex w-fit items-center gap-1.5 text-sm font-semibold text-denim hover:text-denim-dark"
+        >
+          View all homes
+          <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.2} />
+        </Link>
       </div>
     </section>
   );
 }
 
-function FeaturedListingCard({ listing }: { listing: Listing }) {
+function FeaturedListingCard({ listing, href }: { listing: Listing; href?: string }) {
   return (
     <Link
-      href={`/listings/${listing.id}`}
+      href={href ?? `/listings/${listing.id}`}
       className="group grid grid-cols-1 overflow-hidden rounded-tl-4xl rounded-br-4xl rounded-tr-2xl rounded-bl-2xl border border-wood/35 bg-card transition-all duration-300 hover:shadow-[0_24px_48px_rgba(26,22,17,0.16)] md:grid-cols-[1.2fr_1fr]"
     >
       <div className="relative h-60 w-full overflow-hidden md:h-full md:min-h-80">
@@ -165,6 +133,11 @@ function FeaturedListingCard({ listing }: { listing: Listing }) {
         <p className="line-clamp-2 text-[14.5px] leading-relaxed text-ink-soft">
           {listing.description[0]}
         </p>
+        {listing.price !== null && (
+          <span className="text-sm font-semibold text-ink">
+            ${listing.price} <span className="font-normal text-muted">/ night</span>
+          </span>
+        )}
         <span className="mt-1 flex w-fit items-center gap-2 rounded-full bg-terracotta px-5 py-2.5 text-sm font-bold text-card transition-colors group-hover:bg-terracotta-dark">
           View this home
           <ArrowRight
@@ -177,10 +150,10 @@ function FeaturedListingCard({ listing }: { listing: Listing }) {
   );
 }
 
-export function ListingCard({ listing }: { listing: Listing }) {
+export function ListingCard({ listing, href }: { listing: Listing; href?: string }) {
   return (
     <Link
-      href={`/listings/${listing.id}`}
+      href={href ?? `/listings/${listing.id}`}
       className="group flex flex-col overflow-hidden rounded-tl-3xl rounded-br-3xl rounded-tr-md rounded-bl-md border border-wood/35 bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_36px_rgba(26,22,17,0.14)]"
     >
       <div className="relative h-47.5 w-full overflow-hidden md:h-52">
@@ -237,6 +210,11 @@ export function ListingCard({ listing }: { listing: Listing }) {
             />
           )}
         </div>
+        {listing.price !== null && (
+          <span className="text-[13px] font-semibold text-ink md:text-[13.5px]">
+            ${listing.price} <span className="font-normal text-muted">/ night</span>
+          </span>
+        )}
         <span className="mt-0.5 flex items-center gap-1.5 text-[13px] font-bold text-denim md:text-[13.5px]">
           View listing
           <ArrowRight

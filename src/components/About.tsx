@@ -1,10 +1,18 @@
 import Image from "next/image";
 import { Star, Home as HomeIcon, type LucideIcon } from "lucide-react";
-import { averageRating, listings } from "@/lib/listings";
+import { getAverageRating, getCities, type Listing } from "@/lib/listings";
 import Reveal from "./Reveal";
 import Highlight from "./Highlight";
 
-export default function About() {
+export default function About({ listings }: { listings: Listing[] }) {
+  const averageRating = getAverageRating(listings);
+  const cities = getCities(listings);
+  const citiesLabel =
+    cities.length >= 2
+      ? `from ${cities[0]} to ${cities[cities.length - 1]}`
+      : cities.length === 1
+        ? `in ${cities[0]}`
+        : "across Texas";
   return (
     <section
       id="about"
@@ -35,10 +43,10 @@ export default function About() {
               treatment that comes with it.
             </p>
             <p className="text-[15px] leading-relaxed text-ink-soft md:text-[16.5px]">
-              Our homes are spread across Texas, from El Paso to Wichita
-              Falls — each one a genuine All-American cottage with room to
-              spread out, a full kitchen, and air conditioning that actually
-              keeps up with the heat. Traveling with pets or need more than a
+              Our homes are spread across Texas, {citiesLabel} — each one a
+              genuine All-American cottage with room to spread out, a full
+              kitchen, and air conditioning that actually keeps up with the
+              heat. Traveling with pets or need more than a
               weekend? Some homes are pet-friendly and set up for extended
               stays, because VIP treatment shouldn&apos;t stop after one
               night.

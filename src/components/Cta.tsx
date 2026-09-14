@@ -2,9 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Mail, ArrowRight, Sparkles, Star } from "lucide-react";
 import Reveal from "./Reveal";
-import { averageRating, listings } from "@/lib/listings";
+import { getAverageRating, getTotalReviews, type Listing } from "@/lib/listings";
 
-export default function Cta() {
+export default function Cta({ listings }: { listings: Listing[] }) {
+  const averageRating = getAverageRating(listings);
+  const totalReviews = getTotalReviews(listings);
   return (
     <section className="relative overflow-hidden bg-cream-2 px-5 py-14 md:px-16 md:py-20">
       <div
@@ -44,19 +46,22 @@ export default function Cta() {
 
           <div className="relative mt-2 flex flex-wrap items-center justify-center gap-4 md:justify-start">
             <Link
-              href="/#listings"
-              className="flex items-center gap-2 rounded-full bg-terracotta px-7 py-3.5 font-ui text-sm font-semibold text-card transition-colors hover:bg-terracotta-dark"
+              href="/properties"
+              className="group flex items-center gap-2 rounded-full bg-terracotta px-7 py-3.5 font-ui text-sm font-semibold text-card transition-colors hover:bg-terracotta-dark"
             >
               Browse our homes
-              <ArrowRight className="h-4 w-4" strokeWidth={2.2} />
+              <ArrowRight
+                className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                strokeWidth={2.2}
+              />
             </Link>
-            <a
-              href="mailto:eddie@bookviphomes.com"
+            <Link
+              href="/contact"
               className="flex items-center gap-2 rounded-full border border-wood/50 px-7 py-3.5 font-ui text-sm font-semibold text-ink-soft transition-colors hover:border-wood hover:bg-cream-2"
             >
               <Mail className="h-4 w-4" strokeWidth={2} />
-              Email Eddie
-            </a>
+              Contact
+            </Link>
           </div>
         </div>
 
@@ -71,7 +76,7 @@ export default function Cta() {
           <div className="absolute inset-0 bg-linear-to-r from-card/60 via-transparent to-transparent" />
           <span className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-card/95 px-3 py-1.5 text-[12.5px] font-bold text-ink shadow-sm backdrop-blur-sm">
             <Star className="h-3.5 w-3.5 fill-terracotta text-terracotta" />
-            {averageRating} avg rating
+            {totalReviews > 0 ? `${totalReviews} guest reviews` : `${averageRating} avg rating`}
           </span>
         </div>
       </Reveal>

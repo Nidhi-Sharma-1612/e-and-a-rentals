@@ -1,3 +1,13 @@
+import { cache } from "react";
+import {
+  fetchListings,
+  fetchCancellationPolicies,
+  fetchReviews,
+  type HostawayListing,
+  type HostawayCancellationPolicy,
+  type HostawayReview,
+} from "@/lib/hostaway";
+
 export type Review = {
   name: string;
   date: string;
@@ -16,164 +26,222 @@ export type Listing = {
   baths: number;
   tag?: string;
   city?: string;
+  lat: number | null;
+  lng: number | null;
+  bedrooms: number;
   description: string[];
-  amenities: string[];
-  totalAmenities?: number;
+  allAmenities: string[];
+  houseRules: string | null;
   checkIn: string;
   checkOut: string;
   petsAllowed: boolean;
   smokingAllowed: boolean;
   cancellationPolicy: string[];
   reviews: Review[];
+  price: number | null;
+  currency: string;
+  cleaningFee: number | null;
+  minNights: number | null;
+  guestsIncluded: number | null;
+  extraGuestFee: number | null;
 };
 
-export const listings: Listing[] = [
-  {
-    id: "273132",
-    name: "All American Cottage",
-    city: "Wichita Falls",
-    image: "/images/cottage1-b.jpg",
-    images: [
-      "/images/cottage1-b.jpg",
-      "/images/cottage1-a.jpg",
-      "/images/cottage1-c.jpg",
-      "/images/cottage1-d.jpg",
-      "/images/cottage1-e.jpg",
-    ],
-    rating: "4.85",
-    reviewCount: 13,
-    guests: 8,
-    beds: 3,
-    baths: 2,
-    description: [
-      "Keep it simple at this peaceful and cozy centrally-located home. This home works well for the business traveler, work crews or here visiting friends and family.",
-      "The home has been renovated and ready to entertain you and your guests.",
-    ],
-    amenities: ["Free WiFi", "Kitchen", "Air conditioning", "Washing Machine", "Pets allowed", "Suitable for children"],
-    totalAmenities: 48,
-    checkIn: "4:00 PM",
-    checkOut: "11:00 AM",
-    petsAllowed: true,
-    smokingAllowed: false,
-    cancellationPolicy: [
-      "100% refund up to 30 days before arrival",
-      "50% refund up to 14 days before arrival",
-    ],
-    reviews: [
-      { name: "Lenna Richardson", date: "March 2026", text: "We love the location of this little house!! So easy to get to food and coffee!!" },
-      { name: "Dustin Frazier", date: "December 2025", text: "Overall a great little place to stay. House was very clean, nice yard for pets, and plenty spacious to host our family Christmas." },
-      { name: "Andrea Hyde", date: "November 2025", text: "Such a cute place! Perfect location to everything." },
-      { name: "Dana and Scott Shipley", date: "November 2025", text: "Everything was great and there was plenty of space." },
-      { name: "Kevin Conklin", date: "October 2025", text: "Very good stay and good location to the surrounding area." },
-    ],
-  },
-  {
-    id: "264828",
-    name: "All American Cottage",
-    city: "Wichita Falls",
-    image: "/images/cottage2-a.jpg",
-    images: [
-      "/images/cottage2-a.jpg",
-      "/images/cottage2-b.jpg",
-      "/images/cottage2-c.jpg",
-      "/images/cottage2-d.jpg",
-      "/images/cottage2-e.jpg",
-    ],
-    rating: "4.90",
-    reviewCount: 6,
-    guests: 8,
-    beds: 3,
-    baths: 2,
-    description: [
-      "Keep it simple at this peaceful and cozy centrally-located home. This home works well for the business traveler, work crews or here visiting friends and family.",
-    ],
-    amenities: ["Free WiFi", "Kitchen", "Air conditioning", "Washing Machine", "Suitable for children", "Internet"],
-    checkIn: "4:00 PM",
-    checkOut: "11:00 AM",
-    petsAllowed: false,
-    smokingAllowed: false,
-    cancellationPolicy: [
-      "100% refund up to 30 days before arrival",
-      "50% refund up to 14 days before arrival",
-    ],
-    reviews: [
-      { name: "Ray Green", date: "March 2026", text: "Great stay!! Had 3 grand kids with us and the park behind the house was awesome." },
-      { name: "Thomas Attaway", date: "January 2026", text: "Location was excellent. Everything was just like we needed it." },
-      { name: "Phillip Smith", date: "January 2026", text: "The house very nice. We enjoyed the quiet neighborhood." },
-    ],
-  },
-  {
-    id: "368868",
-    name: "All American Paso Del Norte",
-    city: "El Paso",
-    image: "/images/pasodelnorte-a.jpg",
-    images: [
-      "/images/pasodelnorte-a.jpg",
-      "/images/pasodelnorte-b.jpg",
-      "/images/pasodelnorte-c.jpg",
-      "/images/pasodelnorte-d.jpg",
-      "/images/pasodelnorte-e.jpg",
-    ],
-    rating: "4.95",
-    reviewCount: 1,
-    guests: 8,
-    beds: 4,
-    baths: 2,
-    description: [
-      "Bring the whole family to this beautiful and spacious Spanish-style home. The home is fully equipped with hi-speed WiFi, 3 bedrooms, and a master bedroom with a jetted tub for you to enjoy and relax.",
-      "This place is your home away from home — perfect for families visiting, business travelers, and first responders.",
-    ],
-    amenities: ["Kitchen", "Air conditioning", "Washing Machine", "Pets allowed", "Internet", "Wireless"],
-    totalAmenities: 48,
-    checkIn: "4:00 PM",
-    checkOut: "10:00 AM",
-    petsAllowed: true,
-    smokingAllowed: false,
-    cancellationPolicy: [
-      "100% refund up to 30 days before arrival",
-      "50% refund up to 14 days before arrival",
-    ],
-    reviews: [
-      { name: "Tommy Seale", date: "April 2026", text: "Everything was great, thanks!" },
-    ],
-  },
-  {
-    id: "576036",
-    name: "The Lucile",
-    city: "Wichita Falls",
-    image: "/images/lucile-a.jpg",
-    images: [
-      "/images/lucile-a.jpg",
-      "/images/lucile-c.jpg",
-      "/images/lucile-d.jpg",
-      "/images/lucile-e.jpg",
-    ],
-    rating: "5.00",
-    guests: 10,
-    beds: 4,
-    baths: 2,
-    tag: "Extended-stay friendly",
-    description: [
-      "Welcome to Lucile House — a fully furnished 4-bedroom, 2-bath home designed with comfort, convenience, and long-term stays in mind.",
-    ],
-    amenities: ["Free WiFi", "Kitchen", "Air conditioning", "Washing Machine", "Street parking", "Suitable for children"],
-    totalAmenities: 65,
-    checkIn: "4:00 PM",
-    checkOut: "10:00 AM",
-    petsAllowed: false,
-    smokingAllowed: false,
-    cancellationPolicy: [
-      "100% refund up to 30 days before arrival",
-      "50% refund up to 14 days before arrival",
-    ],
-    reviews: [],
-  },
-];
+function displayName(rawName: string): string {
+  // Hostaway listing names are sometimes SEO-stuffed for channels
+  // ("The Lucile - Spacious 4BR ... | Fast Wi-Fi"); use just the first
+  // segment as the on-site display name.
+  return rawName.split(" - ")[0].split(" | ")[0].trim();
+}
 
-export const averageRating = (
-  listings.reduce((sum, l) => sum + parseFloat(l.rating), 0) / listings.length
-).toFixed(1);
+function formatHour(hour: number | null): string {
+  if (hour === null) return "Flexible";
+  const period = hour >= 12 ? "PM" : "AM";
+  const twelveHour = hour % 12 === 0 ? 12 : hour % 12;
+  return `${twelveHour}:00 ${period}`;
+}
 
-export function getListing(id: string): Listing | undefined {
-  return listings.find((l) => l.id === id);
+function formatCancellationPolicy(
+  policy: HostawayCancellationPolicy | undefined
+): string[] {
+  if (!policy) {
+    return ["Contact us for this home's cancellation policy."];
+  }
+  return policy.cancellationPolicyItem
+    .slice()
+    .sort((a, b) => b.timeDelta - a.timeDelta)
+    .map((item) => {
+      const days = Math.round(Math.abs(item.timeDelta) / 86400);
+      const unit = item.refundType === "percentage" ? "%" : "";
+      return `${item.refundAmount}${unit} refund up to ${days} day${days === 1 ? "" : "s"} before arrival`;
+    });
+}
+
+// Hostaway descriptions sometimes carry markdown syntax meant for a
+// renderer this site doesn't have; strip it down to plain paragraphs.
+function cleanDescriptionLine(line: string): string {
+  return line
+    .replace(/^#+\s*/, "")
+    .replace(/^[*-]\s+/, "• ")
+    .trim();
+}
+
+function formatReviewDate(departureDate: string): string {
+  const date = new Date(departureDate.replace(" ", "T"));
+  return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+}
+
+function mapListing(
+  raw: HostawayListing,
+  policy: HostawayCancellationPolicy | undefined,
+  reviews: HostawayReview[]
+): Listing {
+  const images = raw.listingImages
+    .slice()
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map((img) => img.url);
+
+  const amenityNames = raw.listingAmenities.map((a) => a.amenityName);
+
+  const listingReviews = reviews
+    .filter(
+      (r) =>
+        r.listingMapId === raw.id &&
+        r.type === "guest-to-host" &&
+        r.status === "published"
+    )
+    .sort(
+      (a, b) => new Date(b.departureDate).getTime() - new Date(a.departureDate).getTime()
+    );
+
+  const reviewsWithText = listingReviews
+    .filter((r) => r.publicReview)
+    .slice(0, 5)
+    .map((r) => ({
+      name: r.reviewerName || r.guestName,
+      date: formatReviewDate(r.departureDate),
+      text: r.publicReview as string,
+    }));
+
+  return {
+    id: String(raw.id),
+    name: displayName(raw.externalListingName || raw.name),
+    image: images[0] ?? "/images/cottage1-b.jpg",
+    images: images.length > 0 ? images : ["/images/cottage1-b.jpg"],
+    rating:
+      raw.averageReviewRating !== null
+        ? (raw.averageReviewRating / 2).toFixed(2)
+        : "New",
+    reviewCount: listingReviews.length || undefined,
+    guests: raw.personCapacity,
+    beds: raw.bedsNumber,
+    baths: raw.bathroomsNumber,
+    tag: raw.listingTags[0]?.name,
+    city: raw.city ?? undefined,
+    lat: raw.lat,
+    lng: raw.lng,
+    bedrooms: raw.bedroomsNumber,
+    description: (raw.description ?? "")
+      .split(/\r?\n+/)
+      .map(cleanDescriptionLine)
+      .filter(Boolean),
+    allAmenities: amenityNames,
+    houseRules: raw.houseRules?.trim() || null,
+    checkIn: formatHour(raw.checkInTimeStart),
+    checkOut: formatHour(raw.checkOutTime),
+    petsAllowed: amenityNames.some((n) => /pet/i.test(n)),
+    smokingAllowed: amenityNames.some((n) => /smoking allowed/i.test(n)),
+    cancellationPolicy: formatCancellationPolicy(policy),
+    reviews: reviewsWithText,
+    price: raw.price,
+    currency: raw.currencyCode ?? "USD",
+    cleaningFee: raw.cleaningFee,
+    minNights: raw.minNights,
+    guestsIncluded: raw.guestsIncluded,
+    extraGuestFee: raw.priceForExtraPerson,
+  };
+}
+
+export const getListings = cache(async (): Promise<Listing[]> => {
+  const [rawListings, policies, reviews] = await Promise.all([
+    fetchListings(),
+    fetchCancellationPolicies(),
+    fetchReviews(),
+  ]);
+
+  const policyById = new Map(policies.map((p) => [p.id, p]));
+
+  return rawListings.map((raw) =>
+    mapListing(raw, policyById.get(raw.cancellationPolicyId ?? -1), reviews)
+  );
+});
+
+export async function getListing(id: string): Promise<Listing | undefined> {
+  const all = await getListings();
+  return all.find((l) => l.id === id);
+}
+
+export type BookingPriceBreakdown = {
+  nights: number;
+  nightlyTotal: number;
+  cleaningFee: number;
+  extraGuests: number;
+  extraGuestTotal: number;
+  total: number;
+};
+
+// Shared by the booking widget (display) and the checkout API route
+// (server-side recompute, so a client can't tamper with the charged
+// amount) — keeping one source of truth for the math.
+//
+// `nightlyTotal` is the real sum of Hostaway's per-day rates for the
+// selected nights (weekends/seasons can price differently from the
+// listing's base rate) — pass it whenever real calendar prices are
+// available. Falls back to nights × the listing's base price only when
+// they aren't (e.g. calendar temporarily unreachable).
+export function computeBookingTotal(
+  listing: Listing,
+  nights: number,
+  guests: number,
+  nightlyTotal?: number | null
+): BookingPriceBreakdown | null {
+  if (nights <= 0) return null;
+  const resolvedNightlyTotal =
+    nightlyTotal ?? (listing.price !== null ? listing.price * nights : null);
+  if (resolvedNightlyTotal === null) return null;
+  const cleaningFee = listing.cleaningFee ?? 0;
+  const extraGuests =
+    listing.guestsIncluded !== null ? Math.max(0, guests - listing.guestsIncluded) : 0;
+  const extraGuestTotal = extraGuests * (listing.extraGuestFee ?? 0) * nights;
+  return {
+    nights,
+    nightlyTotal: resolvedNightlyTotal,
+    cleaningFee,
+    extraGuests,
+    extraGuestTotal,
+    total: resolvedNightlyTotal + cleaningFee + extraGuestTotal,
+  };
+}
+
+export function getCities(listings: Listing[]): string[] {
+  return Array.from(new Set(listings.map((l) => l.city).filter((c): c is string => !!c)));
+}
+
+// Amenities present on every listing — safe to advertise site-wide, unlike
+// amenities only some homes have.
+export function getCommonAmenities(listings: Listing[]): string[] {
+  if (listings.length === 0) return [];
+  const [first, ...rest] = listings.map((l) => new Set(l.allAmenities));
+  return Array.from(first).filter((amenity) => rest.every((set) => set.has(amenity)));
+}
+
+export function getAverageRating(listings: Listing[]): string {
+  const rated = listings.filter((l) => l.rating !== "New");
+  if (rated.length === 0) return "New";
+  return (
+    rated.reduce((sum, l) => sum + parseFloat(l.rating), 0) / rated.length
+  ).toFixed(1);
+}
+
+export function getTotalReviews(listings: Listing[]): number {
+  return listings.reduce((sum, l) => sum + (l.reviewCount ?? 0), 0);
 }

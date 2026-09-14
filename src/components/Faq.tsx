@@ -4,35 +4,69 @@ import { useState } from "react";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import Reveal from "./Reveal";
 import Highlight from "./Highlight";
+import { getCities, getCommonAmenities, type Listing } from "@/lib/listings";
 
-const faqs = [
-  {
-    question: "Do you allow pets?",
-    answer:
-      "Yes — select homes are pet-friendly. Look for the paw icon when browsing, or email Eddie to confirm for a specific property.",
-  },
-  {
-    question: "Where are your homes located?",
-    answer: "Our homes are located across Texas, including El Paso and Wichita Falls.",
-  },
-  {
-    question: "Is there a minimum length of stay?",
-    answer:
-      "It varies by home — some, like The Lucile, are set up especially for extended stays. Reach out to Eddie and he'll help you find the right fit.",
-  },
-  {
-    question: "What's included in every home?",
-    answer:
-      "Every home comes with free WiFi, a full kitchen, and air conditioning. Some homes also have a washer & dryer, a pool, or are pet-friendly — check each listing for details.",
-  },
-  {
-    question: "How do I book or ask a question?",
-    answer:
-      "Browse our homes above to check dates, then reach out directly — Eddie personally reads every message and can help lock in your stay.",
-  },
-];
+function joinWithAnd(items: string[]): string {
+  if (items.length <= 1) return items.join("");
+  if (items.length === 2) return items.join(" and ");
+  return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
+}
 
-export default function Faq() {
+export default function Faq({ listings }: { listings: Listing[] }) {
+  const cities = getCities(listings);
+  const petFriendly = listings.filter((l) => l.petsAllowed);
+  const rawCommonAmenities = getCommonAmenities(listings);
+  const hasWifi = rawCommonAmenities.includes("Internet") || rawCommonAmenities.includes("Wireless");
+  const amenityHighlightOrder = ["Kitchen", "Air conditioning", "Washing Machine", "Heating", "Free parking"];
+  const commonAmenities = [
+    ...(hasWifi ? ["free WiFi"] : []),
+    ...rawCommonAmenities
+      .filter((a) => amenityHighlightOrder.includes(a))
+      .sort((a, b) => amenityHighlightOrder.indexOf(a) - amenityHighlightOrder.indexOf(b))
+      .map((a) => a.toLowerCase()),
+  ];
+  const minNightsValues = listings
+    .map((l) => l.minNights)
+    .filter((n): n is number => n !== null);
+  const minStay = minNightsValues.length > 0 ? Math.min(...minNightsValues) : null;
+  const maxMinStay = minNightsValues.length > 0 ? Math.max(...minNightsValues) : null;
+
+  const faqs = [
+    {
+      question: "Do you allow pets?",
+      answer:
+        petFriendly.length > 0
+          ? `Yes — ${petFriendly.length} of our ${listings.length} homes are pet-friendly (${petFriendly.map((l) => l.name).join(", ")}). Look for the paw icon when browsing, or email Eddie to confirm for a specific property.`
+          : "Email Eddie to check pet policies for a specific property.",
+    },
+    {
+      question: "Where are your homes located?",
+      answer:
+        cities.length > 0
+          ? `Our homes are located across Texas, including ${joinWithAnd(cities)}.`
+          : "Our homes are located across Texas.",
+    },
+    {
+      question: "Is there a minimum length of stay?",
+      answer:
+        minStay !== null
+          ? `It varies by home — anywhere from ${minStay} night${minStay === 1 ? "" : "s"} to ${maxMinStay} night${maxMinStay === 1 ? "" : "s"} depending on the property. Reach out to Eddie and he'll help you find the right fit.`
+          : "It varies by home. Reach out to Eddie and he'll help you find the right fit.",
+    },
+    {
+      question: "What's included in every home?",
+      answer:
+        commonAmenities.length > 0
+          ? `Every home comes with ${joinWithAnd(commonAmenities.slice(0, 3))}. Amenities vary beyond that — check each listing for the full list.`
+          : "Amenities vary by home — check each listing for details.",
+    },
+    {
+      question: "How do I book or ask a question?",
+      answer:
+        "Browse our homes above to check dates, then reach out directly — Eddie personally reads every message and can help lock in your stay.",
+    },
+  ];
+
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   function toggle(i: number) {

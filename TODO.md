@@ -5,13 +5,28 @@ priority. Check items off as they're done.
 
 ## Outstanding
 
-- [ ] **No pricing shown anywhere ("Contact for pricing").** Left
-      deliberately as-is — no real rate data exists to show, and inventing
-      one would be dishonest. Decide whether to surface real rates once
-      available (via the Hostaway integration), or reconsider how
-      prominent the date/guest picker should be in the meantime.
+None currently.
 
 ## Completed
+
+- [x] **Real pricing, date-aware.** Hostaway/Stripe integration replaced
+      "Contact for pricing" with real per-listing rates. Prices are fetched
+      per selected date range (Hostaway prices weekends/seasons
+      differently from a listing's base rate), shown in the booking
+      widget's breakdown, and charged via Stripe Checkout using that same
+      real total — never a flat base-price × nights guess.
+- [x] **Hostaway integration** — live listings, availability calendars,
+      reviews, and amenities replace all static/placeholder content
+      site-wide (`src/lib/hostaway.ts`, `src/lib/listings.ts`).
+- [x] **Stripe Checkout** — booking widget creates a real Checkout Session
+      server-side (secret key only, no webhook dependency); a
+      `booking-confirmed` page verifies payment via session retrieval.
+- [x] **Dedicated `/properties` search results page** — the homepage
+      search widget now navigates here with real query params (shareable
+      URL) instead of filtering an in-page section; results are checked
+      against live availability, not just location/guest count.
+- [x] **Contact page** — replaced the header/footer "Contact" mailto
+      shortcut with a real `/contact` page (form + direct info).
 
 - [x] **Focus states** — added a site-wide `:focus-visible` outline
       (terracotta-dark, 2px) covering every link/button/input, instead of

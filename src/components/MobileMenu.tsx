@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { Menu, X, Mail } from "lucide-react";
-import { useActiveSection } from "@/hooks/useActiveSection";
-import { sectionIdFromHref } from "@/lib/nav";
+import { useActiveNavHref } from "@/hooks/useActiveNavHref";
 
 type NavLink = {
   label: string;
@@ -12,14 +11,9 @@ type NavLink = {
 };
 
 export default function MobileMenu({ navLinks }: { navLinks: NavLink[] }) {
-  const pathname = usePathname();
+  const activeHref = useActiveNavHref(navLinks);
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const sectionIds = navLinks
-    .map((link) => sectionIdFromHref(link.href))
-    .filter((id) => id !== "");
-  const scrollActive = useActiveSection(sectionIds);
-  const active = pathname.startsWith("/listings/") ? "listings" : scrollActive;
 
   useEffect(() => {
     function onClickOutside(event: MouseEvent) {
@@ -58,8 +52,7 @@ export default function MobileMenu({ navLinks }: { navLinks: NavLink[] }) {
         <div className="fixed inset-x-0 top-16 z-40 max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-wood/30 bg-card px-5 pb-5 pt-4 shadow-lg md:top-21">
           <nav className="flex flex-col">
             {navLinks.map((link) => {
-              const id = sectionIdFromHref(link.href);
-              const isActive = id === active;
+              const isActive = link.href === activeHref;
               return (
                 <a
                   key={link.label}
@@ -76,14 +69,14 @@ export default function MobileMenu({ navLinks }: { navLinks: NavLink[] }) {
             })}
           </nav>
           <div className="mt-3 border-t border-wood/25 pt-4">
-            <a
-              href="mailto:eddie@bookviphomes.com"
+            <Link
+              href="/contact"
               onClick={() => setOpen(false)}
               className="flex items-center justify-center gap-2 rounded-xl bg-denim px-4 py-3.5 font-ui text-base font-semibold text-cream transition-colors hover:bg-denim-dark"
             >
               <Mail className="h-4 w-4" strokeWidth={2} />
               Contact
-            </a>
+            </Link>
           </div>
         </div>
       )}

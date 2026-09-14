@@ -1,8 +1,9 @@
 import Image from "next/image";
 import { ChevronDown } from "lucide-react";
 import BookingWidget from "./BookingWidget";
+import type { Listing } from "@/lib/listings";
 
-export default function Hero() {
+export default function Hero({ listings }: { listings: Listing[] }) {
   return (
     <section className="relative flex min-h-[calc(100dvh-64px)] flex-col md:min-h-[calc(100dvh-84px)]">
       <div className="absolute inset-0 -z-10 overflow-hidden">
@@ -44,7 +45,7 @@ export default function Hero() {
         </div>
 
         <div className="w-full max-w-4xl animate-fade-up [animation-delay:380ms]">
-          <BookingWidget />
+          <BookingWidget listings={listings} />
         </div>
       </div>
 

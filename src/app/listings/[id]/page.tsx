@@ -5,12 +5,14 @@ import {
   Star,
   Users,
   BedDouble,
+  DoorOpen,
   Bath,
   LogIn,
   LogOut,
   PawPrint,
   CigaretteOff,
   ShieldCheck,
+  ScrollText,
   MapPin,
   ArrowRight,
   Quote,
@@ -19,10 +21,11 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PhotoGallery from "@/components/PhotoGallery";
 import ListingBookingWidget from "@/components/ListingBookingWidget";
+import AmenitiesList from "@/components/AmenitiesList";
+import ListingMap from "@/components/ListingMap";
 import { ListingCard } from "@/components/Listings";
-import { listings, getListing } from "@/lib/listings";
-import { amenityIcon } from "@/lib/amenity-icons";
-import { mapEmbedUrl, externalMapUrl } from "@/lib/city-coords";
+import { getListings, getListing } from "@/lib/listings";
+import { externalMapUrl } from "@/lib/city-coords";
 
 const REVIEW_AVATAR_COLORS = [
   { bg: "bg-terracotta", text: "text-card" },
@@ -40,7 +43,8 @@ function initials(name: string): string {
     .toUpperCase();
 }
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const listings = await getListings();
   return listings.map((l) => ({ id: l.id }));
 }
 
@@ -50,7 +54,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const listing = getListing(id);
+  const listing = await getListing(id);
   if (!listing) return {};
   const title = `${listing.name} | Book VIP Homes`;
   const description = listing.description[0];
@@ -80,21 +84,34 @@ export async function generateMetadata({
   };
 }
 
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
 export default async function ListingPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ checkIn?: string; checkOut?: string; guests?: string }>;
 }) {
   const { id } = await params;
-  const listing = getListing(id);
+  const [listing, listings, query] = await Promise.all([
+    getListing(id),
+    getListings(),
+    searchParams,
+  ]);
   if (!listing) notFound();
 
   const otherListings = listings.filter((l) => l.id !== listing.id);
-  const extraAmenityCount = listing.totalAmenities
-    ? listing.totalAmenities - listing.amenities.length
-    : 0;
-  const mapUrl = mapEmbedUrl(listing.city);
-  const externalMapHref = externalMapUrl(listing.city);
+  const mapLocation = { id: listing.id, lat: listing.lat, lng: listing.lng, city: listing.city };
+  const externalMapHref = externalMapUrl(mapLocation);
+
+  // Prefill from the homepage search widget, if the guest arrived from
+  // there — invalid or missing values just fall back to an empty widget.
+  const initialCheckIn = query.checkIn && ISO_DATE.test(query.checkIn) ? query.checkIn : null;
+  const initialCheckOut = query.checkOut && ISO_DATE.test(query.checkOut) ? query.checkOut : null;
+  const parsedGuests = query.guests ? Number(query.guests) : null;
+  const initialGuests =
+    parsedGuests && Number.isInteger(parsedGuests) && parsedGuests > 0 ? parsedGuests : null;
 
   return (
     <>
@@ -108,7 +125,7 @@ export default async function ListingPage({
           <nav className="flex items-center gap-1.5 text-[13px] text-muted">
             <Link href="/" className="hover:text-terracotta">Home</Link>
             <span>/</span>
-            <Link href="/#listings" className="hover:text-terracotta">All listings</Link>
+            <Link href="/properties" className="hover:text-terracotta">All listings</Link>
             <span>/</span>
             <span className="text-ink-soft">{listing.name}</span>
           </nav>
@@ -145,7 +162,8 @@ export default async function ListingPage({
           <div className="flex min-w-0 flex-col gap-10">
             <div className="flex flex-wrap items-center gap-3 border-b border-wood/25 pb-8">
               <Fact icon={Users} label={`${listing.guests} guests`} />
-              <Fact icon={BedDouble} label={`${listing.beds} bedrooms`} />
+              <Fact icon={DoorOpen} label={`${listing.bedrooms} bedroom${listing.bedrooms === 1 ? "" : "s"}`} />
+              <Fact icon={BedDouble} label={`${listing.beds} bed${listing.beds === 1 ? "" : "s"}`} />
               <Fact icon={Bath} label={`${listing.baths} bathrooms`} />
             </div>
 
@@ -153,7 +171,12 @@ export default async function ListingPage({
                 small screens only — the sticky sidebar version below
                 handles it from lg upward. */}
             <div className="lg:hidden">
-              <ListingBookingWidget rating={listing.rating} reviewCount={listing.reviewCount} />
+              <ListingBookingWidget
+                listing={listing}
+                initialCheckIn={initialCheckIn}
+                initialCheckOut={initialCheckOut}
+                initialGuests={initialGuests}
+              />
             </div>
 
             <section className="flex flex-col gap-3">
@@ -167,27 +190,7 @@ export default async function ListingPage({
 
             <section className="flex flex-col gap-4">
               <h2 className="font-heading text-xl font-semibold">What this place offers</h2>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {listing.amenities.map((amenity) => {
-                  const Icon = amenityIcon(amenity);
-                  return (
-                    <div
-                      key={amenity}
-                      className="flex items-center gap-2.5 rounded-xl border border-wood/25 bg-card px-3.5 py-3"
-                    >
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sage/10">
-                        <Icon className="h-4 w-4 text-sage" strokeWidth={2} />
-                      </div>
-                      <span className="text-sm text-ink-soft">{amenity}</span>
-                    </div>
-                  );
-                })}
-              </div>
-              {extraAmenityCount > 0 && (
-                <p className="text-sm text-muted">
-                  +{extraAmenityCount} more amenities — email Eddie for the full list.
-                </p>
-              )}
+              <AmenitiesList amenities={listing.allAmenities} />
             </section>
 
             <section className="flex flex-col gap-4">
@@ -220,6 +223,20 @@ export default async function ListingPage({
                   ))}
                 </ul>
               </div>
+
+              {listing.houseRules && (
+                <div className="flex flex-col gap-2 rounded-tl-2xl rounded-br-2xl rounded-tr-md rounded-bl-md border border-wood/30 bg-cream-2 p-5">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-terracotta/10">
+                      <ScrollText className="h-4 w-4 text-terracotta" strokeWidth={2} />
+                    </div>
+                    <span className="font-heading font-semibold text-ink">House rules</span>
+                  </div>
+                  <p className="pl-1 text-sm leading-relaxed text-ink-soft">
+                    {listing.houseRules}
+                  </p>
+                </div>
+              )}
             </section>
 
             <section className="flex flex-col gap-3">
@@ -229,13 +246,8 @@ export default async function ListingPage({
                 {listing.city ? `${listing.city}, Texas` : "Texas"} — exact address shared after booking.
               </p>
               <div className="relative overflow-hidden rounded-tl-3xl rounded-br-3xl rounded-tr-md rounded-bl-md border border-wood/30 bg-cream-2 shadow-[0_14px_28px_rgba(43,33,24,0.1)]">
-                <iframe
-                  src={mapUrl}
-                  className="h-80 w-full"
-                  loading="lazy"
-                  title={listing.city ? `General area map of ${listing.city}, Texas` : "Map of Texas"}
-                />
-                <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-card/95 px-3 py-1.5 text-[11px] font-bold text-ink shadow-sm">
+                <ListingMap location={mapLocation} />
+                <span className="pointer-events-none absolute left-3 top-3 z-1000 rounded-full bg-card/95 px-3 py-1.5 text-[11px] font-bold text-ink shadow-sm">
                   Approximate area
                 </span>
               </div>
@@ -300,8 +312,10 @@ export default async function ListingPage({
               inline above "About this home" instead (see above). */}
           <aside className="hidden h-fit lg:sticky lg:top-24 lg:block">
             <ListingBookingWidget
-              rating={listing.rating}
-              reviewCount={listing.reviewCount}
+              listing={listing}
+              initialCheckIn={initialCheckIn}
+              initialCheckOut={initialCheckOut}
+              initialGuests={initialGuests}
             />
           </aside>
         </div>

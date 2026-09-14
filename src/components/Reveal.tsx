@@ -28,6 +28,10 @@ export default function Reveal({
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    // Flips the SSR-safe "always visible" baseline into the animated
+    // hidden/reveal state once we're on the client — there's no way to
+    // derive this from an external system, it's the mount signal itself.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHasMounted(true);
     const node = ref.current;
     if (!node) return;
