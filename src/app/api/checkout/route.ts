@@ -3,6 +3,7 @@ import { getStripe } from "@/lib/stripe";
 import { getListing, computeBookingTotal } from "@/lib/listings";
 import { fetchListingCalendar, hasCalendarConflict } from "@/lib/hostaway";
 import { addDays, toISODate } from "@/lib/date";
+import { getRequestOrigin } from "@/lib/site";
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -134,7 +135,7 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const origin = request.nextUrl.origin;
+  const origin = getRequestOrigin(request);
 
   try {
     const stripe = getStripe();
