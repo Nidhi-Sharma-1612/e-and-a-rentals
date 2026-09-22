@@ -8,21 +8,27 @@ import Faq from "@/components/Faq";
 import Cta from "@/components/Cta";
 import Footer from "@/components/Footer";
 import { getListings } from "@/lib/listings";
+import { getPageSections, getSiteSettings, str } from "@/lib/cms";
 
 export default async function Home() {
-  const listings = await getListings();
+  const [listings, sections, settings] = await Promise.all([
+    getListings(),
+    getPageSections("home"),
+    getSiteSettings(),
+  ]);
+  const email = settings?.email || "eddie@bookviphomes.com";
 
   return (
     <>
       <Header />
       <main id="main-content">
-        <Hero listings={listings} />
-        <About listings={listings} />
-        <Listings listings={listings} />
-        <Amenities listings={listings} />
-        <Testimonials listings={listings} />
-        <Faq listings={listings} />
-        <Cta listings={listings} />
+        <Hero listings={listings} content={sections.hero ?? {}} />
+        <About listings={listings} content={sections.about ?? {}} email={email} />
+        <Listings listings={listings} content={sections.listings ?? {}} />
+        <Amenities listings={listings} content={sections.amenities ?? {}} />
+        <Testimonials listings={listings} content={sections.testimonials ?? {}} />
+        <Faq listings={listings} eyebrow={str(sections.faq ?? {}, "eyebrow", "Common questions")} />
+        <Cta listings={listings} content={sections.cta ?? {}} />
       </main>
       <Footer />
     </>

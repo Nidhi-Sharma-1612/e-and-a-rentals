@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Home, Mail } from "lucide-react";
 import Reveal from "./Reveal";
 import BackToTop from "./BackToTop";
+import { getPageSections, getSiteSettings, str, strList } from "@/lib/cms";
 
 function FacebookIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -27,27 +28,55 @@ function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-const exploreLinks = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "/#about" },
-  { label: "All listings", href: "/properties" },
-  { label: "Amenities", href: "/#amenities" },
-  { label: "Reviews", href: "/#testimonials" },
-  { label: "FAQ", href: "/#faq" },
-];
+// Hrefs are fixed; the visible labels can be overridden from the admin
+// panel (same order as below).
+const EXPLORE_HREFS = ["/", "/#about", "/properties", "/#amenities", "/#testimonials", "/#faq"];
+const DEFAULT_EXPLORE_LABELS = ["Home", "About", "All listings", "Amenities", "Reviews", "FAQ"];
 
-const legalLinks = [
-  { label: "Privacy Policy", href: "/privacy-policy" },
-  { label: "Terms and conditions", href: "/terms-and-conditions" },
-  { label: "Cookie Preferences", href: "/cookie-preferences" },
-];
+const LEGAL_HREFS = ["/privacy-policy", "/terms-and-conditions", "/cookie-preferences"];
 
-const socialLinks = [
-  { label: "Facebook", href: "#", icon: FacebookIcon },
-  { label: "Instagram", href: "#", icon: InstagramIcon },
-];
+export default async function Footer() {
+  const [global, settings] = await Promise.all([getPageSections("global"), getSiteSettings()]);
+  const footer = global.footer ?? {};
 
-export default function Footer() {
+  const siteName = settings?.siteName || "Book VIP Homes";
+  const tagline = str(global.navbar ?? {}, "tagline", "by Valencia Investment Properties");
+  const description =
+    settings?.footerTagline ||
+    "Furnished, direct-booking homes across Texas — with a real host who picks up the phone.";
+  const email = settings?.email || "eddie@bookviphomes.com";
+  const copyrightName = settings?.copyrightName || siteName;
+  const copyrightNote = str(
+    footer,
+    "copyrightNote",
+    "a Valencia Investment Properties company. All rights reserved.",
+  );
+
+  // Same 6 labels as the header nav — reuses that field instead of asking
+  // for the same list to be edited twice.
+  const exploreLabels = strList(global.navbar ?? {}, "links", DEFAULT_EXPLORE_LABELS, EXPLORE_HREFS.length);
+  const exploreLinks = EXPLORE_HREFS.map((href, i) => ({ href, label: exploreLabels[i] }));
+  const legalLabels = strList(
+    footer,
+    "legal",
+    [
+      str(footer, "privacyLabel", "Privacy Policy"),
+      str(footer, "termsLabel", "Terms and conditions"),
+      str(footer, "cookieLabel", "Cookie Preferences"),
+    ],
+    LEGAL_HREFS.length,
+  );
+  const legalLinks = LEGAL_HREFS.map((href, i) => ({ href, label: legalLabels[i] }));
+
+  // Only shown once a link is actually set in Settings > Social links — both
+  // currently point at "#" (no real profile yet).
+  const facebookUrl = settings?.socialLinks?.facebook || "";
+  const instagramUrl = settings?.socialLinks?.instagram || "";
+  const socialLinks = [
+    ...(facebookUrl ? [{ label: "Facebook", href: facebookUrl, icon: FacebookIcon }] : []),
+    ...(instagramUrl ? [{ label: "Instagram", href: instagramUrl, icon: InstagramIcon }] : []),
+  ];
+
   return (
     <footer className="relative mt-auto overflow-hidden bg-ink text-cream">
       <div
@@ -67,48 +96,54 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:gap-8">
           <div className="flex max-w-xs flex-col gap-4">
             <div className="flex items-center gap-2">
-              <Home className="h-5 w-5 shrink-0 text-terracotta" strokeWidth={1.8} />
+              {settings?.logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- CMS-managed URL can be any domain
+                <img src={settings.logoUrl} alt={siteName} className="h-7 w-auto" />
+              ) : (
+                <Home className="h-5 w-5 shrink-0 text-terracotta" strokeWidth={1.8} />
+              )}
               <span className="flex flex-col leading-tight">
                 <span className="font-heading text-lg font-bold uppercase tracking-wide">
-                  Book VIP Homes
+                  {siteName}
                 </span>
                 <span className="text-[11px] text-cream/55">
-                  by Valencia Investment Properties
+                  {tagline}
                 </span>
               </span>
             </div>
-            <p className="text-[13px] leading-relaxed text-cream/60">
-              Furnished, direct-booking homes across Texas — with a real host
-              who picks up the phone.
-            </p>
+            <p className="text-[13px] leading-relaxed text-cream/60">{description}</p>
 
-            <div className="flex items-center gap-2.5 pt-1">
-              {socialLinks.map(({ label, href, icon: Icon }) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-cream/10 text-cream/80 transition-all hover:-translate-y-0.5 hover:bg-gold hover:text-ink"
-                >
-                  <Icon className="h-4 w-4" strokeWidth={1.8} />
-                </a>
-              ))}
-            </div>
+            {socialLinks.length > 0 && (
+              <div className="flex items-center gap-2.5 pt-1">
+                {socialLinks.map(({ label, href, icon: Icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={label}
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-cream/10 text-cream/80 transition-all hover:-translate-y-0.5 hover:bg-gold hover:text-ink"
+                  >
+                    <Icon className="h-4 w-4" strokeWidth={1.8} />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
-          <FooterColumn heading="Explore" links={exploreLinks} />
-          <FooterColumn heading="Legal" links={legalLinks} />
+          <FooterColumn heading={str(footer, "exploreHeading", "Explore")} links={exploreLinks} />
+          <FooterColumn heading={str(footer, "legalHeading", "Legal")} links={legalLinks} />
 
           <div className="flex flex-col gap-2.5">
             <span className="text-[11.5px] font-bold uppercase tracking-wide text-cream/50">
-              Get in touch
+              {str(footer, "contactHeading", "Get in touch")}
             </span>
             <a
-              href="mailto:eddie@bookviphomes.com"
+              href={`mailto:${email}`}
               className="flex items-center gap-1.5 text-sm text-cream/85 transition-all hover:translate-x-0.5 hover:text-cream"
             >
               <Mail className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
-              eddie@bookviphomes.com
+              {email}
             </a>
           </div>
         </div>
@@ -117,8 +152,7 @@ export default function Footer() {
 
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <span className="text-[12.5px] text-cream/55">
-            © 2026 Book VIP Homes, a Valencia Investment Properties company. All
-            rights reserved.
+            © {new Date().getFullYear()} {copyrightName}, {copyrightNote}
           </span>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <span className="flex items-center gap-1.5 text-[12.5px] text-cream/55">

@@ -1,0 +1,89 @@
+import "server-only";
+
+import { cache } from "react";
+
+// Fetches editable marketing copy (hero text, section headings, settings,
+// etc.) from the Design by Dial admin panel. Every call has a hardcoded
+// fallback in the calling component, so the live site keeps working even if
+// the admin panel or its database is unreachable. Listing data itself (and
+// reviews, amenities, cities) still comes live from Hostaway — only the
+// fixed marketing copy around it is editable here.
+//
+// Deliberately uncached across requests (`cache: "no-store"`): this is a
+// low-traffic marketing site, so a fresh request per page load is cheap, and
+// it means an edit in the admin panel shows up on the very next page load
+// with zero cache-invalidation complexity. `cache()` below only de-duplicates
+// identical calls *within* one render (e.g. the layout and a page both
+// reading the same settings).
+const CMS_URL = process.env.ADMIN_PANEL_API_URL;
+const CMS_API_KEY = process.env.ADMIN_PANEL_API_KEY;
+const CMS_SITE_SLUG = "vip";
+
+const cmsFetch = cache(async function cmsFetch<T>(path: string): Promise<T | null> {
+  if (!CMS_URL || !CMS_API_KEY) return null;
+
+  try {
+    const res = await fetch(`${CMS_URL}/api/public/${CMS_SITE_SLUG}${path}`, {
+      headers: { "x-api-key": CMS_API_KEY },
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
+});
+
+export type Section = Record<string, unknown>;
+
+export async function getPageSections(pageSlug: string): Promise<Record<string, Section>> {
+  const data = await cmsFetch<{ sections: Record<string, Section> }>(`/pages/${pageSlug}`);
+  return data?.sections ?? {};
+}
+
+export type CmsSettings = {
+  siteName?: string;
+  logoUrl?: string | null;
+  email?: string;
+  phone?: string;
+  whatsapp?: string;
+  address?: string;
+  responseTimeNote?: string;
+  footerTagline?: string;
+  copyrightName?: string;
+  socialLinks?: Record<string, string>;
+};
+
+export async function getSiteSettings(): Promise<CmsSettings | null> {
+  const data = await cmsFetch<{ settings: CmsSettings | null }>("/settings");
+  return data?.settings ?? null;
+}
+
+// A single string field off a section's content, or the fallback when it is
+// missing/blank.
+export function str(section: Section, key: string, fallback: string): string {
+  const value = section[key];
+  return typeof value === "string" && value.trim() ? value : fallback;
+}
+
+// A list of strings (nav labels, chips…). When `exactLength` is set the CMS
+// list is only used if it has that many entries — for lists whose items are
+// paired with fixed hrefs in code, so a stray added/deleted row can never
+// shift a label onto the wrong link.
+export function strList(
+  section: Section,
+  key: string,
+  fallback: string[],
+  exactLength?: number,
+): string[] {
+  const value = section[key];
+  if (
+    !Array.isArray(value) ||
+    value.length === 0 ||
+    !value.every((v) => typeof v === "string" && v.trim())
+  ) {
+    return fallback;
+  }
+  if (exactLength !== undefined && value.length !== exactLength) return fallback;
+  return value as string[];
+}

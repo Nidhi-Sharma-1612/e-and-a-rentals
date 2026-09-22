@@ -2,6 +2,7 @@ import Reveal from "./Reveal";
 import TestimonialCarousel from "./TestimonialCarousel";
 import Highlight from "./Highlight";
 import type { Listing } from "@/lib/listings";
+import { str, type Section } from "@/lib/cms";
 
 // Longest, most substantive reviews read best in a carousel — this also
 // naturally filters out one-line reviews ("Great stay!") in favor of ones
@@ -9,7 +10,13 @@ import type { Listing } from "@/lib/listings";
 const MIN_QUOTE_LENGTH = 60;
 const MAX_TESTIMONIALS = 12;
 
-export default function Testimonials({ listings }: { listings: Listing[] }) {
+export default function Testimonials({
+  listings,
+  content,
+}: {
+  listings: Listing[];
+  content: Section;
+}) {
   const testimonials = listings
     .flatMap((listing) =>
       listing.reviews.map((review) => ({
@@ -40,7 +47,7 @@ export default function Testimonials({ listings }: { listings: Listing[] }) {
       <div className="relative mx-auto flex max-w-6xl flex-col gap-9 md:gap-12">
         <Reveal className="mx-auto flex max-w-xl flex-col items-center gap-2.5 text-center md:gap-3">
           <span className="font-ui text-xs font-bold uppercase tracking-[0.15em] text-sage-dark md:tracking-[0.2em]">
-            What guests say
+            {str(content, "eyebrow", "What guests say")}
           </span>
           <h2 className="font-heading text-[27px] font-bold md:text-4xl">
             Stories from <Highlight>our guests</Highlight>

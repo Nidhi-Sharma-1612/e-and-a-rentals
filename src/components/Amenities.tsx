@@ -13,6 +13,7 @@ import {
 import Reveal from "./Reveal";
 import Highlight from "./Highlight";
 import { getCommonAmenities, type Listing } from "@/lib/listings";
+import { str, type Section } from "@/lib/cms";
 
 const ICONS: Record<string, LucideIcon> = {
   "Free WiFi": Wifi,
@@ -48,7 +49,13 @@ const PREFERRED_ORDER = [
   "Hot water",
 ];
 
-export default function Amenities({ listings }: { listings: Listing[] }) {
+export default function Amenities({
+  listings,
+  content,
+}: {
+  listings: Listing[];
+  content: Section;
+}) {
   const rawCommon = getCommonAmenities(listings);
   // "Internet" and "Wireless" both mean WiFi in Hostaway's amenity list —
   // collapse them into one tile instead of showing the same thing twice.
@@ -81,14 +88,17 @@ export default function Amenities({ listings }: { listings: Listing[] }) {
       <div className="relative mx-auto flex max-w-5xl flex-col gap-12 md:gap-16">
         <Reveal className="mx-auto flex max-w-xl flex-col items-center gap-2.5 text-center md:gap-3">
           <span className="font-ui text-xs font-bold uppercase tracking-[0.15em] text-sage-dark md:tracking-[0.2em]">
-            What&apos;s included
+            {str(content, "eyebrow", "What's included")}
           </span>
           <h2 className="font-heading text-[27px] font-bold md:text-4xl">
             The comforts of <Highlight>home</Highlight>, every time.
           </h2>
           <p className="text-[14.5px] leading-relaxed text-ink-soft md:text-base">
-            Every VIP home comes stocked with the essentials — plus a few
-            extras at select properties.
+            {str(
+              content,
+              "description",
+              "Every VIP home comes stocked with the essentials — plus a few extras at select properties.",
+            )}
           </p>
         </Reveal>
 

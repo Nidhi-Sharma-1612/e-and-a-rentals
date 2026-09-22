@@ -12,7 +12,13 @@ function joinWithAnd(items: string[]): string {
   return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
 }
 
-export default function Faq({ listings }: { listings: Listing[] }) {
+export default function Faq({
+  listings,
+  eyebrow,
+}: {
+  listings: Listing[];
+  eyebrow: string;
+}) {
   const cities = getCities(listings);
   const petFriendly = listings.filter((l) => l.petsAllowed);
   const rawCommonAmenities = getCommonAmenities(listings);
@@ -82,7 +88,7 @@ export default function Faq({ listings }: { listings: Listing[] }) {
         <Reveal className="mx-auto flex max-w-xl flex-col items-center gap-2.5 text-center md:gap-3">
           <span className="flex items-center gap-2 font-ui text-xs font-bold uppercase tracking-[0.15em] text-sage-dark md:tracking-[0.2em]">
             <HelpCircle className="h-4 w-4" strokeWidth={2} />
-            Common questions
+            {eyebrow}
           </span>
           <h2 className="font-heading text-[27px] font-bold md:text-4xl">
             Frequently asked <Highlight>questions</Highlight>

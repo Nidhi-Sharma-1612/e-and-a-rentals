@@ -4,8 +4,15 @@ import { Star, Users, BedDouble, Bath, ArrowRight, Sparkles, MapPin, PawPrint } 
 import { type Listing } from "@/lib/listings";
 import Reveal from "./Reveal";
 import Highlight from "./Highlight";
+import { str, type Section } from "@/lib/cms";
 
-export default function Listings({ listings }: { listings: Listing[] }) {
+export default function Listings({
+  listings,
+  content,
+}: {
+  listings: Listing[];
+  content: Section;
+}) {
   const [featured, ...rest] = listings;
 
   return (
@@ -20,14 +27,17 @@ export default function Listings({ listings }: { listings: Listing[] }) {
       <div className="relative mx-auto flex max-w-7xl flex-col gap-7 md:gap-11">
         <Reveal className="mx-auto flex max-w-xl flex-col items-center gap-2.5 text-center md:gap-3">
           <span className="font-ui text-xs font-bold uppercase tracking-[0.15em] text-sage-dark md:tracking-[0.2em]">
-            Our homes
+            {str(content, "eyebrow", "Our homes")}
           </span>
           <h2 className="font-heading text-[27px] font-bold md:text-4xl">
             Pick your <Highlight>home base</Highlight>
           </h2>
           <p className="text-[14.5px] leading-relaxed text-ink-soft md:text-base">
-            Every home comes with free WiFi, a full kitchen, and air
-            conditioning — because comfort shouldn&apos;t be optional.
+            {str(
+              content,
+              "description",
+              "Every home comes with free WiFi, a full kitchen, and air conditioning — because comfort shouldn't be optional.",
+            )}
           </p>
         </Reveal>
 
@@ -53,7 +63,7 @@ export default function Listings({ listings }: { listings: Listing[] }) {
           href="/properties"
           className="mx-auto flex w-fit items-center gap-1.5 text-sm font-semibold text-denim hover:text-denim-dark"
         >
-          View all homes
+          {str(content, "viewAllLabel", "View all homes")}
           <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.2} />
         </Link>
       </div>

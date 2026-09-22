@@ -3,8 +3,15 @@ import Link from "next/link";
 import { Mail, ArrowRight, Sparkles, Star } from "lucide-react";
 import Reveal from "./Reveal";
 import { getAverageRating, getTotalReviews, type Listing } from "@/lib/listings";
+import { str, type Section } from "@/lib/cms";
 
-export default function Cta({ listings }: { listings: Listing[] }) {
+export default function Cta({
+  listings,
+  content,
+}: {
+  listings: Listing[];
+  content: Section;
+}) {
   const averageRating = getAverageRating(listings);
   const totalReviews = getTotalReviews(listings);
   return (
@@ -26,17 +33,20 @@ export default function Cta({ listings }: { listings: Listing[] }) {
 
           <span className="relative mx-auto flex w-fit items-center gap-2 rounded-full border border-terracotta/25 bg-terracotta/10 px-4 py-1.5 font-ui text-xs font-bold uppercase tracking-[0.15em] text-terracotta-dark md:mx-0">
             <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
-            Ready when you are
+            {str(content, "badge", "Ready when you are")}
           </span>
 
           <h2 className="relative text-balance font-heading text-[30px] font-bold leading-[1.1] text-ink md:text-[42px]">
-            Book Direct. <span className="text-terracotta">Stay VIP.</span>
+            {str(content, "headingPlain", "Book Direct.")}{" "}
+            <span className="text-terracotta">{str(content, "headingAccent", "Stay VIP.")}</span>
           </h2>
 
           <p className="relative max-w-md text-[14.5px] leading-relaxed text-ink-soft md:text-base">
-            Browse our homes, pick your dates, and let Eddie take it from
-            there — no call centers, no middlemen, just the VIP treatment
-            every guest deserves.
+            {str(
+              content,
+              "description",
+              "Browse our homes, pick your dates, and let Eddie take it from there — no call centers, no middlemen, just the VIP treatment every guest deserves.",
+            )}
           </p>
 
           <div className="relative mx-auto flex items-center gap-1.5 text-[13px] font-semibold text-muted md:mx-0">
@@ -49,7 +59,7 @@ export default function Cta({ listings }: { listings: Listing[] }) {
               href="/properties"
               className="group flex items-center gap-2 rounded-full bg-terracotta px-7 py-3.5 font-ui text-sm font-semibold text-card transition-colors hover:bg-terracotta-dark"
             >
-              Browse our homes
+              {str(content, "primaryLabel", "Browse our homes")}
               <ArrowRight
                 className="h-4 w-4 transition-transform group-hover:translate-x-1"
                 strokeWidth={2.2}
@@ -60,14 +70,14 @@ export default function Cta({ listings }: { listings: Listing[] }) {
               className="flex items-center gap-2 rounded-full border border-wood/50 px-7 py-3.5 font-ui text-sm font-semibold text-ink-soft transition-colors hover:border-wood hover:bg-cream-2"
             >
               <Mail className="h-4 w-4" strokeWidth={2} />
-              Contact
+              {str(content, "secondaryLabel", "Contact")}
             </Link>
           </div>
         </div>
 
         <div className="relative hidden min-h-80 md:block">
           <Image
-            src="/images/lucile-e.jpg"
+            src={str(content, "image", "/images/lucile-e.jpg")}
             alt="Cozy living room interior at one of our furnished VIP homes"
             fill
             sizes="(min-width: 768px) 45vw, 100vw"

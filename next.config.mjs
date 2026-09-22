@@ -11,6 +11,13 @@ const nextConfig = {
         protocol: "https",
         hostname: "hostaway-platform.s3.*.amazonaws.com",
       },
+      // Images uploaded/pasted through the admin panel are served from its
+      // /api/media proxy.
+      {
+        protocol: "https",
+        hostname: "admin.weblaucher.com",
+        pathname: "/api/media/**",
+      },
     ],
   },
 };

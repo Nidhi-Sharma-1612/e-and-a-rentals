@@ -4,14 +4,18 @@ import { Mail, Clock, MessageCircleQuestion } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ContactForm from "@/components/ContactForm";
-import { CONTACT_EMAIL } from "@/lib/site";
+import { getPageSections, getSiteSettings, str } from "@/lib/cms";
 
 export const metadata: Metadata = {
   title: "Contact | Book VIP Homes",
   description: "Get in touch with Eddie about a stay at one of our VIP Homes across Texas.",
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const [sections, settings] = await Promise.all([getPageSections("contact"), getSiteSettings()]);
+  const intro = sections.intro ?? {};
+  const email = settings?.email || "eddie@bookviphomes.com";
+
   return (
     <>
       <Header />
@@ -29,18 +33,20 @@ export default function ContactPage() {
 
           <div className="mt-4 flex flex-col gap-2">
             <h1 className="font-heading text-[28px] font-bold leading-tight md:text-4xl">
-              Get in touch
+              {str(intro, "heading", "Get in touch")}
             </h1>
             <p className="max-w-xl text-[15px] leading-relaxed text-ink-soft">
-              Questions about a home, your dates, or anything else — Eddie
-              reads every message personally and answers directly, no call
-              center in between.
+              {str(
+                intro,
+                "description",
+                "Questions about a home, your dates, or anything else — Eddie reads every message personally and answers directly, no call center in between.",
+              )}
             </p>
           </div>
 
           <div className="mt-10 grid grid-cols-1 gap-8 md:mt-14 md:grid-cols-[1fr_360px] md:gap-12">
             <div className="rounded-tl-3xl rounded-br-3xl rounded-tr-md rounded-bl-md border border-wood/30 bg-card p-6 shadow-[0_18px_36px_rgba(43,33,24,0.08)] md:p-8">
-              <ContactForm />
+              <ContactForm contactEmail={email} />
             </div>
 
             <div className="flex flex-col gap-4">
@@ -54,25 +60,32 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <InfoCard icon={Mail} label="Email">
+              <InfoCard icon={Mail} label={str(intro, "emailLabel", "Email")}>
                 <a
-                  href={`mailto:${CONTACT_EMAIL}`}
+                  href={`mailto:${email}`}
                   className="font-semibold text-denim hover:text-denim-dark"
                 >
-                  {CONTACT_EMAIL}
+                  {email}
                 </a>
               </InfoCard>
 
-              <InfoCard icon={Clock} label="Response time">
-                Usually within a few hours — Eddie answers his own email.
+              <InfoCard icon={Clock} label={str(intro, "responseTimeLabel", "Response time")}>
+                {str(
+                  intro,
+                  "responseTimeText",
+                  "Usually within a few hours — Eddie answers his own email.",
+                )}
               </InfoCard>
 
-              <InfoCard icon={MessageCircleQuestion} label="Before you book">
-                Have a question about a specific home? Browse{" "}
+              <InfoCard
+                icon={MessageCircleQuestion}
+                label={str(intro, "beforeYouBookLabel", "Before you book")}
+              >
+                {str(intro, "beforeYouBookPrefix", "Have a question about a specific home? Browse")}{" "}
                 <Link href="/properties" className="font-semibold text-denim hover:text-denim-dark">
-                  all our homes
+                  {str(intro, "beforeYouBookLinkLabel", "all our homes")}
                 </Link>{" "}
-                first, then mention which one in your message.
+                {str(intro, "beforeYouBookSuffix", "first, then mention which one in your message.")}
               </InfoCard>
             </div>
           </div>

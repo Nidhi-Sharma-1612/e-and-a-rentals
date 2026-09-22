@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { getListing } from "@/lib/listings";
 import { getStripe } from "@/lib/stripe";
 import { formatDisplayDate } from "@/lib/date";
+import { getPageSections, str } from "@/lib/cms";
 
 export const metadata: Metadata = { title: "Booking confirmed | Book VIP Homes" };
 
@@ -19,7 +20,11 @@ export default async function BookingConfirmedPage({
 }) {
   const { id } = await params;
   const { session_id: sessionId } = await searchParams;
-  const listing = await getListing(id);
+  const [listing, sections] = await Promise.all([
+    getListing(id),
+    getPageSections("booking-confirmed"),
+  ]);
+  const t = sections.content ?? {};
 
   let paid = false;
   let error: string | null = null;
@@ -65,7 +70,11 @@ export default async function BookingConfirmedPage({
                   You&apos;re booked at {listing.name}
                 </h1>
                 <p className="text-sm text-ink-soft">
-                  A confirmation has been sent by Stripe to the email you paid with.
+                  {str(
+                    t,
+                    "successNote",
+                    "A confirmation has been sent by Stripe to the email you paid with.",
+                  )}
                 </p>
               </div>
 
@@ -93,7 +102,7 @@ export default async function BookingConfirmedPage({
                 )}
                 {amountTotal !== null && (
                   <div className="flex items-center justify-between border-t border-wood/25 pt-3 font-semibold text-ink">
-                    <span>Total paid</span>
+                    <span>{str(t, "totalLabel", "Total paid")}</span>
                     <span>
                       {(amountTotal / 100).toFixed(2)} {currency.toUpperCase()}
                     </span>
@@ -105,7 +114,7 @@ export default async function BookingConfirmedPage({
                 href="/properties"
                 className="flex items-center gap-1.5 text-sm font-semibold text-denim hover:text-denim-dark"
               >
-                Browse more homes
+                {str(t, "browseMoreLabel", "Browse more homes")}
                 <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.2} />
               </Link>
             </>
@@ -114,7 +123,7 @@ export default async function BookingConfirmedPage({
               <XCircle className="h-14 w-14 text-terracotta" strokeWidth={1.5} />
               <div className="flex flex-col gap-1.5">
                 <h1 className="font-heading text-2xl font-bold text-ink md:text-3xl">
-                  We couldn&apos;t confirm this booking
+                  {str(t, "failedHeading", "We couldn't confirm this booking")}
                 </h1>
                 <p className="text-sm text-ink-soft">{error}</p>
               </div>
@@ -123,7 +132,7 @@ export default async function BookingConfirmedPage({
                   href={`/listings/${listing.id}`}
                   className="flex items-center gap-1.5 text-sm font-semibold text-denim hover:text-denim-dark"
                 >
-                  Back to {listing.name}
+                  {str(t, "backToHomeLabel", "Back to")} {listing.name}
                   <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.2} />
                 </Link>
               )}

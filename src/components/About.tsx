@@ -1,10 +1,19 @@
 import Image from "next/image";
 import { Star, Home as HomeIcon, type LucideIcon } from "lucide-react";
 import { getAverageRating, getCities, type Listing } from "@/lib/listings";
+import { str, type Section } from "@/lib/cms";
 import Reveal from "./Reveal";
 import Highlight from "./Highlight";
 
-export default function About({ listings }: { listings: Listing[] }) {
+export default function About({
+  listings,
+  content,
+  email,
+}: {
+  listings: Listing[];
+  content: Section;
+  email: string;
+}) {
   const averageRating = getAverageRating(listings);
   const cities = getCities(listings);
   const citiesLabel =
@@ -26,7 +35,7 @@ export default function About({ listings }: { listings: Listing[] }) {
       <div className="relative mx-auto max-w-6xl px-5 py-16 md:px-16 md:py-24">
         <Reveal className="max-w-2xl">
           <span className="font-ui text-xs font-bold uppercase tracking-[0.15em] text-sage-dark md:tracking-[0.2em]">
-            About us
+            {str(content, "eyebrow", "About us")}
           </span>
           <h2 className="mt-3 font-heading text-[32px] font-bold leading-[1.08] md:text-[52px]">
             Book direct. Get treated like <Highlight>VIP</Highlight>.
@@ -36,28 +45,26 @@ export default function About({ listings }: { listings: Listing[] }) {
         <div className="mt-10 grid grid-cols-1 gap-12 md:mt-14 md:grid-cols-12 md:items-start md:gap-8">
           <Reveal variant="left" className="flex flex-col gap-4 md:col-span-7">
             <p className="text-[15px] leading-relaxed text-ink-soft md:text-[16.5px]">
-              Book VIP Homes is a small, family-run collection of homes —
-              three and four bedrooms, room for the whole group, and a host
-              who answers his own email. No call centers, no faceless
-              platforms — just a direct line to your stay and the VIP
-              treatment that comes with it.
+              {str(
+                content,
+                "paragraph1",
+                "Book VIP Homes is a small, family-run collection of homes — three and four bedrooms, room for the whole group, and a host who answers his own email. No call centers, no faceless platforms — just a direct line to your stay and the VIP treatment that comes with it.",
+              )}
             </p>
             <p className="text-[15px] leading-relaxed text-ink-soft md:text-[16.5px]">
-              Our homes are spread across Texas, {citiesLabel} — each one a
-              genuine All-American cottage with room to spread out, a full
-              kitchen, and air conditioning that actually keeps up with the
-              heat. Traveling with pets or need more than a
-              weekend? Some homes are pet-friendly and set up for extended
-              stays, because VIP treatment shouldn&apos;t stop after one
-              night.
+              {str(
+                content,
+                "paragraph2",
+                `Our homes are spread across Texas, ${citiesLabel} — each one a genuine All-American cottage with room to spread out, a full kitchen, and air conditioning that actually keeps up with the heat. Traveling with pets or need more than a weekend? Some homes are pet-friendly and set up for extended stays, because VIP treatment shouldn't stop after one night.`,
+              )}
             </p>
             <p className="text-[15px] leading-relaxed text-ink-soft md:text-[16.5px]">
-              Questions before you book? Eddie reads every message at{" "}
+              {str(content, "paragraph3Prefix", "Questions before you book? Eddie reads every message at")}{" "}
               <a
-                href="mailto:eddie@bookviphomes.com"
+                href={`mailto:${email}`}
                 className="font-semibold text-denim hover:text-denim-dark"
               >
-                eddie@bookviphomes.com
+                {email}
               </a>
               .
             </p>
@@ -67,13 +74,13 @@ export default function About({ listings }: { listings: Listing[] }) {
                 icon={Star}
                 iconClassName="fill-terracotta text-terracotta"
                 value={averageRating}
-                label="avg. guest rating"
+                label={str(content, "ratingLabel", "avg. guest rating")}
               />
               <Stat
                 icon={HomeIcon}
                 iconClassName="text-denim"
                 value={listings.length}
-                label="homes to choose from"
+                label={str(content, "homesLabel", "homes to choose from")}
               />
             </div>
           </Reveal>
@@ -81,7 +88,7 @@ export default function About({ listings }: { listings: Listing[] }) {
           <Reveal variant="right" className="relative mx-auto mb-8 w-full max-w-md md:col-span-5 md:mb-10">
             <div className="relative aspect-4/5 w-full overflow-hidden rounded-tl-4xl rounded-br-4xl rounded-tr-md rounded-bl-md border border-wood/30 shadow-[0_26px_54px_rgba(25,21,33,0.18)]">
               <Image
-                src="/images/cottage2-a.jpg"
+                src={str(content, "image", "/images/cottage2-a.jpg")}
                 alt="An All American Cottage exterior with a flag by the front door"
                 fill
                 sizes="(min-width: 768px) 420px, 100vw"
@@ -94,8 +101,12 @@ export default function About({ listings }: { listings: Listing[] }) {
                 VIP
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-ink">Eddie</span>
-                <span className="text-xs text-muted">Your host</span>
+                <span className="text-sm font-semibold text-ink">
+                  {str(content, "hostName", "Eddie")}
+                </span>
+                <span className="text-xs text-muted">
+                  {str(content, "hostTitle", "Your host")}
+                </span>
               </div>
             </div>
           </Reveal>

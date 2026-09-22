@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { Send } from "lucide-react";
-import { CONTACT_EMAIL } from "@/lib/site";
-
-export default function ContactForm() {
+export default function ContactForm({ contactEmail }: { contactEmail: string }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -13,7 +11,7 @@ export default function ContactForm() {
     e.preventDefault();
     const subject = `Message from ${name || "the website"}`;
     const body = `${message}\n\n— ${name}${email ? ` (${email})` : ""}`;
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+    window.location.href = `mailto:${contactEmail}?subject=${encodeURIComponent(
       subject
     )}&body=${encodeURIComponent(body)}`;
   }

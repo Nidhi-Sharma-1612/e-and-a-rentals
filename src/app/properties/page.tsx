@@ -7,6 +7,7 @@ import { ListingCard } from "@/components/Listings";
 import { getListings, type Listing } from "@/lib/listings";
 import { fetchListingCalendar, hasCalendarConflict } from "@/lib/hostaway";
 import { formatDisplayDate } from "@/lib/date";
+import { getPageSections, str } from "@/lib/cms";
 
 export const metadata: Metadata = {
   title: "All homes | Book VIP Homes",
@@ -54,7 +55,8 @@ export default async function PropertiesPage({
   searchParams: Promise<Query>;
 }) {
   const query = await searchParams;
-  const listings = await getListings();
+  const [listings, sections] = await Promise.all([getListings(), getPageSections("properties")]);
+  const intro = sections.intro ?? {};
 
   const location = query.location?.trim() || "";
   const guests = query.guests ? Number(query.guests) : null;
@@ -98,12 +100,12 @@ export default async function PropertiesPage({
         <div className="relative mx-auto flex max-w-7xl flex-col gap-7 px-5 py-10 md:gap-9 md:px-16 md:py-14">
           <div className="flex flex-col gap-2">
             <h1 className="font-heading text-[27px] font-bold md:text-4xl">
-              {hasSearch ? "Your search results" : "All our homes"}
+              {hasSearch ? "Your search results" : str(intro, "heading", "All our homes")}
             </h1>
             <p className="text-[14.5px] text-ink-soft md:text-base">
               {hasSearch
                 ? "Homes matching your search, checked against real availability."
-                : "Every VIP Homes property across Texas, in one place."}
+                : str(intro, "description", "Every VIP Homes property across Texas, in one place.")}
             </p>
           </div>
 
