@@ -13,7 +13,7 @@ import {
 import Reveal from "./Reveal";
 import Highlight from "./Highlight";
 import { getCommonAmenities, type Listing } from "@/lib/listings";
-import { str, type Section } from "@/lib/cms";
+import { str, strList, type Section } from "@/lib/cms";
 
 const ICONS: Record<string, LucideIcon> = {
   "Free WiFi": Wifi,
@@ -56,11 +56,17 @@ export default function Amenities({
   listings: Listing[];
   content: Section;
 }) {
+  // An explicit list set in the admin panel wins outright — it's frozen to
+  // those exact labels until someone edits it again. Clearing the field
+  // there reverts to the automatic pick below (whatever's actually common
+  // across every current Hostaway listing).
+  const override = strList(content, "items", []);
+
   const rawCommon = getCommonAmenities(listings);
   // "Internet" and "Wireless" both mean WiFi in Hostaway's amenity list —
   // collapse them into one tile instead of showing the same thing twice.
   const hasWifi = rawCommon.includes("Internet") || rawCommon.includes("Wireless");
-  const common = [
+  const automatic = [
     ...(hasWifi ? ["Free WiFi"] : []),
     ...rawCommon.filter((a) => a !== "Internet" && a !== "Wireless"),
   ]
@@ -73,6 +79,8 @@ export default function Amenities({
       return ai - bi;
     })
     .slice(0, MAX_SHOWN);
+
+  const common = override.length > 0 ? override.slice(0, MAX_SHOWN) : automatic;
   if (common.length === 0) return null;
 
   return (

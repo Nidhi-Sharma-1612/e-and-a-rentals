@@ -26,6 +26,7 @@ import ListingMap from "@/components/ListingMap";
 import { ListingCard } from "@/components/Listings";
 import { getListings, getListing } from "@/lib/listings";
 import { externalMapUrl } from "@/lib/city-coords";
+import { getPageSections, str, type Section } from "@/lib/cms";
 
 const REVIEW_AVATAR_COLORS = [
   { bg: "bg-terracotta", text: "text-card" },
@@ -94,12 +95,14 @@ export default async function ListingPage({
   searchParams: Promise<{ checkIn?: string; checkOut?: string; guests?: string }>;
 }) {
   const { id } = await params;
-  const [listing, listings, query] = await Promise.all([
+  const [listing, listings, query, sections] = await Promise.all([
     getListing(id),
     getListings(),
     searchParams,
+    getPageSections("properties"),
   ]);
   if (!listing) notFound();
+  const t: Section = sections.detail ?? {};
 
   const otherListings = listings.filter((l) => l.id !== listing.id);
   const mapLocation = { id: listing.id, lat: listing.lat, lng: listing.lng, city: listing.city };
@@ -123,9 +126,13 @@ export default async function ListingPage({
         />
         <div className="relative mx-auto max-w-[1312px] px-5 pt-6 md:px-16">
           <nav className="flex items-center gap-1.5 text-[13px] text-muted">
-            <Link href="/" className="hover:text-terracotta">Home</Link>
+            <Link href="/" className="hover:text-terracotta">
+              {str(t, "breadcrumbHomeLabel", "Home")}
+            </Link>
             <span>/</span>
-            <Link href="/properties" className="hover:text-terracotta">All listings</Link>
+            <Link href="/properties" className="hover:text-terracotta">
+              {str(t, "breadcrumbListingsLabel", "All listings")}
+            </Link>
             <span>/</span>
             <span className="text-ink-soft">{listing.name}</span>
           </nav>
@@ -180,7 +187,7 @@ export default async function ListingPage({
             </div>
 
             <section className="flex flex-col gap-3">
-              <h2 className="font-heading text-xl font-semibold">About this home</h2>
+              <h2 className="font-heading text-xl font-semibold">{str(t, "aboutHeading", "About this home")}</h2>
               {listing.description.map((para, i) => (
                 <p key={i} className="text-[15px] leading-relaxed text-ink-soft">
                   {para}
@@ -189,24 +196,40 @@ export default async function ListingPage({
             </section>
 
             <section className="flex flex-col gap-4">
-              <h2 className="font-heading text-xl font-semibold">What this place offers</h2>
+              <h2 className="font-heading text-xl font-semibold">{str(t, "amenitiesHeading", "What this place offers")}</h2>
               <AmenitiesList amenities={listing.allAmenities} />
             </section>
 
             <section className="flex flex-col gap-4">
-              <h2 className="font-heading text-xl font-semibold">Things to know</h2>
+              <h2 className="font-heading text-xl font-semibold">{str(t, "thingsToKnowHeading", "Things to know")}</h2>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <RuleCard icon={LogIn} label="Check-in" value={listing.checkIn} />
-                <RuleCard icon={LogOut} label="Check-out" value={listing.checkOut} />
+                <RuleCard
+                  icon={LogIn}
+                  label={str(t, "checkInLabel", "Check-in")}
+                  value={listing.checkIn}
+                />
+                <RuleCard
+                  icon={LogOut}
+                  label={str(t, "checkOutLabel", "Check-out")}
+                  value={listing.checkOut}
+                />
                 <RuleCard
                   icon={PawPrint}
-                  label="Pets"
-                  value={listing.petsAllowed ? "Allowed" : "Not allowed"}
+                  label={str(t, "petsLabel", "Pets")}
+                  value={
+                    listing.petsAllowed
+                      ? str(t, "allowedLabel", "Allowed")
+                      : str(t, "notAllowedLabel", "Not allowed")
+                  }
                 />
                 <RuleCard
                   icon={CigaretteOff}
-                  label="Smoking"
-                  value={listing.smokingAllowed ? "Allowed" : "Not allowed"}
+                  label={str(t, "smokingLabel", "Smoking")}
+                  value={
+                    listing.smokingAllowed
+                      ? str(t, "allowedLabel", "Allowed")
+                      : str(t, "notAllowedLabel", "Not allowed")
+                  }
                 />
               </div>
 
@@ -215,7 +238,7 @@ export default async function ListingPage({
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-denim/10">
                     <ShieldCheck className="h-4 w-4 text-denim" strokeWidth={2} />
                   </div>
-                  <span className="font-heading font-semibold text-ink">Cancellation policy</span>
+                  <span className="font-heading font-semibold text-ink">{str(t, "cancellationHeading", "Cancellation policy")}</span>
                 </div>
                 <ul className="flex flex-col gap-1 pl-1 text-sm text-ink-soft">
                   {listing.cancellationPolicy.map((line, i) => (
@@ -230,7 +253,7 @@ export default async function ListingPage({
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-terracotta/10">
                       <ScrollText className="h-4 w-4 text-terracotta" strokeWidth={2} />
                     </div>
-                    <span className="font-heading font-semibold text-ink">House rules</span>
+                    <span className="font-heading font-semibold text-ink">{str(t, "houseRulesHeading", "House rules")}</span>
                   </div>
                   <p className="pl-1 text-sm leading-relaxed text-ink-soft">
                     {listing.houseRules}
@@ -240,15 +263,18 @@ export default async function ListingPage({
             </section>
 
             <section className="flex flex-col gap-3">
-              <h2 className="font-heading text-xl font-semibold">Where you&apos;ll be</h2>
+              <h2 className="font-heading text-xl font-semibold">
+                {str(t, "locationHeading", "Where you'll be")}
+              </h2>
               <p className="flex items-center gap-1.5 text-sm text-ink-soft">
                 <MapPin className="h-4 w-4 shrink-0 text-terracotta" strokeWidth={2} />
-                {listing.city ? `${listing.city}, Texas` : "Texas"} — exact address shared after booking.
+                {listing.city ? `${listing.city}, Texas` : "Texas"}{" "}
+                {str(t, "locationSuffix", "— exact address shared after booking.")}
               </p>
               <div className="relative overflow-hidden rounded-tl-3xl rounded-br-3xl rounded-tr-md rounded-bl-md border border-wood/30 bg-cream-2 shadow-[0_14px_28px_rgba(43,33,24,0.1)]">
                 <ListingMap location={mapLocation} />
                 <span className="pointer-events-none absolute left-3 top-3 z-1000 rounded-full bg-card/95 px-3 py-1.5 text-[11px] font-bold text-ink shadow-sm">
-                  Approximate area
+                  {str(t, "approximateAreaLabel", "Approximate area")}
                 </span>
               </div>
               <a
@@ -257,7 +283,7 @@ export default async function ListingPage({
                 rel="noopener noreferrer"
                 className="flex w-fit items-center gap-1.5 text-sm font-semibold text-denim hover:text-denim-dark"
               >
-                Open in Google Maps
+                {str(t, "openMapsLabel", "Open in Google Maps")}
                 <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.2} />
               </a>
             </section>
@@ -265,7 +291,7 @@ export default async function ListingPage({
             {listing.reviews.length > 0 && (
               <section className="flex flex-col gap-4">
                 <h2 className="font-heading text-xl font-semibold">
-                  Guest reviews
+                  {str(t, "reviewsHeading", "Guest reviews")}
                   {listing.reviewCount !== undefined && listing.reviewCount > listing.reviews.length
                     ? ` (showing ${listing.reviews.length} of ${listing.reviewCount})`
                     : ""}
@@ -327,7 +353,7 @@ export default async function ListingPage({
             className="absolute inset-0 opacity-[0.35] bg-[radial-gradient(var(--color-wood)_1px,transparent_1px)] bg-size-[24px_24px]"
           />
           <div className="relative mx-auto flex max-w-[1312px] flex-col gap-6">
-            <h2 className="font-heading text-xl font-semibold md:text-2xl">More homes to consider</h2>
+            <h2 className="font-heading text-xl font-semibold md:text-2xl">{str(t, "moreHomesHeading", "More homes to consider")}</h2>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
               {otherListings.map((l) => (
                 <ListingCard key={l.id} listing={l} />

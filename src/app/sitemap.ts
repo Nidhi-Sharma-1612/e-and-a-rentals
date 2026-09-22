@@ -10,11 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  const legalRoutes: MetadataRoute.Sitemap = [
-    "privacy-policy",
-    "terms-and-conditions",
-    "cookie-preferences",
-  ].map((slug) => ({
+  const legalRoutes: MetadataRoute.Sitemap = ["privacy-policy", "terms-and-conditions"].map((slug) => ({
     url: `${SITE_URL}/${slug}`,
     changeFrequency: "yearly",
     priority: 0.3,

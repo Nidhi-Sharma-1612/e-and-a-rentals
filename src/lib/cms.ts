@@ -41,6 +41,11 @@ export async function getPageSections(pageSlug: string): Promise<Record<string, 
   return data?.sections ?? {};
 }
 
+export async function getCmsFaqs(): Promise<{ question: string; answer: string }[] | null> {
+  const data = await cmsFetch<{ faqs: { question: string; answer: string }[] }>("/faqs");
+  return data?.faqs?.length ? data.faqs : null;
+}
+
 export type CmsSettings = {
   siteName?: string;
   logoUrl?: string | null;
@@ -86,4 +91,23 @@ export function strList(
   }
   if (exactLength !== undefined && value.length !== exactLength) return fallback;
   return value as string[];
+}
+
+// A list of flat objects (legal-page sections, etc). Items missing any of
+// `fields` are dropped; empty (or entirely missing) falls back.
+export function objList<K extends string>(
+  section: Section,
+  key: string,
+  fields: readonly K[],
+  fallback: Record<K, string>[],
+): Record<K, string>[] {
+  const value = section[key];
+  if (!Array.isArray(value)) return fallback;
+  const items = value.filter(
+    (item): item is Record<K, string> =>
+      !!item &&
+      typeof item === "object" &&
+      fields.every((f) => typeof (item as Record<string, unknown>)[f] === "string"),
+  );
+  return items.length > 0 ? items : fallback;
 }

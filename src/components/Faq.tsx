@@ -15,9 +15,14 @@ function joinWithAnd(items: string[]): string {
 export default function Faq({
   listings,
   eyebrow,
+  cmsFaqs,
 }: {
   listings: Listing[];
   eyebrow: string;
+  // Set in the admin panel's FAQ list. Once any are added there, they
+  // replace this component's own auto-generated questions outright —
+  // clear the list in the admin to go back to the automatic ones below.
+  cmsFaqs: { question: string; answer: string }[] | null;
 }) {
   const cities = getCities(listings);
   const petFriendly = listings.filter((l) => l.petsAllowed);
@@ -37,7 +42,7 @@ export default function Faq({
   const minStay = minNightsValues.length > 0 ? Math.min(...minNightsValues) : null;
   const maxMinStay = minNightsValues.length > 0 ? Math.max(...minNightsValues) : null;
 
-  const faqs = [
+  const autoFaqs = [
     {
       question: "Do you allow pets?",
       answer:
@@ -72,6 +77,7 @@ export default function Faq({
         "Browse our homes above to check dates, then reach out directly — Eddie personally reads every message and can help lock in your stay.",
     },
   ];
+  const faqs = cmsFaqs?.length ? cmsFaqs : autoFaqs;
 
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 

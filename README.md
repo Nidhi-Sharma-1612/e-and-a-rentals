@@ -87,7 +87,7 @@ src/
     contact/page.tsx                  Contact page
     api/checkout/route.ts             Creates a Stripe Checkout Session
     api/hostaway/calendar/            Availability (+ per-date pricing) proxy routes
-    privacy-policy/, terms-and-conditions/, cookie-preferences/   Legal pages
+    privacy-policy/, terms-and-conditions/   Legal pages
     sitemap.ts, robots.ts             SEO file conventions
     not-found.tsx                     Branded 404 page
     icon.tsx                          Generated favicon

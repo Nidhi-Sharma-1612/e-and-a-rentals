@@ -54,3 +54,64 @@ export function LegalSection({
     </section>
   );
 }
+
+// Renders a `**bold**` / `[label](href)` lite-markdown body — just enough to
+// let an admin edit these legal sections as plain text while keeping the
+// bold leads and links the original hardcoded copy had. A blank line starts
+// a new paragraph; a block whose every line starts with "- " becomes a
+// bullet list instead.
+function renderInline(text: string, keyPrefix: string): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  const pattern = /\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let i = 0;
+  while ((match = pattern.exec(text))) {
+    if (match.index > lastIndex) nodes.push(text.slice(lastIndex, match.index));
+    if (match[1] !== undefined) {
+      nodes.push(
+        <a
+          key={`${keyPrefix}-${i++}`}
+          href={match[2]}
+          className="font-semibold text-denim hover:text-denim-dark"
+        >
+          {match[1]}
+        </a>,
+      );
+    } else {
+      nodes.push(<strong key={`${keyPrefix}-${i++}`}>{match[3]}</strong>);
+    }
+    lastIndex = pattern.lastIndex;
+  }
+  if (lastIndex < text.length) nodes.push(text.slice(lastIndex));
+  return nodes;
+}
+
+export function LegalBody({ body }: { body: string }) {
+  const blocks = body
+    .split(/\n\s*\n/)
+    .map((b) => b.trim())
+    .filter(Boolean);
+
+  return (
+    <>
+      {blocks.map((block, i) => {
+        const lines = block
+          .split("\n")
+          .map((l) => l.trim())
+          .filter(Boolean);
+        const isList = lines.length > 0 && lines.every((l) => l.startsWith("- "));
+        if (isList) {
+          return (
+            <ul key={i} className="flex list-disc flex-col gap-1.5 pl-5">
+              {lines.map((line, j) => (
+                <li key={j}>{renderInline(line.slice(2), `${i}-${j}`)}</li>
+              ))}
+            </ul>
+          );
+        }
+        return <p key={i}>{renderInline(block, `${i}`)}</p>;
+      })}
+    </>
+  );
+}

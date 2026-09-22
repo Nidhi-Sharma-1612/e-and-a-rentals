@@ -33,7 +33,7 @@ function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
 const EXPLORE_HREFS = ["/", "/#about", "/properties", "/#amenities", "/#testimonials", "/#faq"];
 const DEFAULT_EXPLORE_LABELS = ["Home", "About", "All listings", "Amenities", "Reviews", "FAQ"];
 
-const LEGAL_HREFS = ["/privacy-policy", "/terms-and-conditions", "/cookie-preferences"];
+const LEGAL_HREFS = ["/privacy-policy", "/terms-and-conditions"];
 
 export default async function Footer() {
   const [global, settings] = await Promise.all([getPageSections("global"), getSiteSettings()]);
@@ -59,11 +59,7 @@ export default async function Footer() {
   const legalLabels = strList(
     footer,
     "legal",
-    [
-      str(footer, "privacyLabel", "Privacy Policy"),
-      str(footer, "termsLabel", "Terms and conditions"),
-      str(footer, "cookieLabel", "Cookie Preferences"),
-    ],
+    [str(footer, "privacyLabel", "Privacy Policy"), str(footer, "termsLabel", "Terms and conditions")],
     LEGAL_HREFS.length,
   );
   const legalLinks = LEGAL_HREFS.map((href, i) => ({ href, label: legalLabels[i] }));

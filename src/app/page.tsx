@@ -8,13 +8,14 @@ import Faq from "@/components/Faq";
 import Cta from "@/components/Cta";
 import Footer from "@/components/Footer";
 import { getListings } from "@/lib/listings";
-import { getPageSections, getSiteSettings, str } from "@/lib/cms";
+import { getCmsFaqs, getPageSections, getSiteSettings, str } from "@/lib/cms";
 
 export default async function Home() {
-  const [listings, sections, settings] = await Promise.all([
+  const [listings, sections, settings, cmsFaqs] = await Promise.all([
     getListings(),
     getPageSections("home"),
     getSiteSettings(),
+    getCmsFaqs(),
   ]);
   const email = settings?.email || "eddie@bookviphomes.com";
 
@@ -27,7 +28,11 @@ export default async function Home() {
         <Listings listings={listings} content={sections.listings ?? {}} />
         <Amenities listings={listings} content={sections.amenities ?? {}} />
         <Testimonials listings={listings} content={sections.testimonials ?? {}} />
-        <Faq listings={listings} eyebrow={str(sections.faq ?? {}, "eyebrow", "Common questions")} />
+        <Faq
+          listings={listings}
+          eyebrow={str(sections.faq ?? {}, "eyebrow", "Common questions")}
+          cmsFaqs={cmsFaqs}
+        />
         <Cta listings={listings} content={sections.cta ?? {}} />
       </main>
       <Footer />
