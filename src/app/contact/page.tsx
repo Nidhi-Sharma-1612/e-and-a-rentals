@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function ContactPage() {
   const [sections, settings] = await Promise.all([getPageSections("contact"), getSiteSettings()]);
   const intro = sections.intro ?? {};
-  const email = settings?.email || "eddie@bookviphomes.com";
+  const email = settings?.email || "info@bookviphomes.com";
 
   return (
     <>

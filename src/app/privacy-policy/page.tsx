@@ -46,7 +46,7 @@ export default async function PrivacyPolicyPage() {
   ]);
   const body = sections.body ?? {};
   const updated = str(body, "updated", "August 23, 2026");
-  const email = settings?.email || "eddie@bookviphomes.com";
+  const email = settings?.email || "info@bookviphomes.com";
   const items = objList(body, "sections", ["heading", "body"] as const, FALLBACK_SECTIONS);
 
   return (

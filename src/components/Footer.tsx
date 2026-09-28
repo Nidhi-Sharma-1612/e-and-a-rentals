@@ -44,7 +44,7 @@ export default async function Footer() {
   const description =
     settings?.footerTagline ||
     "Furnished, direct-booking homes across Texas — with a real host who picks up the phone.";
-  const email = settings?.email || "eddie@bookviphomes.com";
+  const email = settings?.email || "info@bookviphomes.com";
   const copyrightName = settings?.copyrightName || siteName;
   const copyrightNote = str(
     footer,

@@ -2,7 +2,7 @@
 // site has a real domain, and sitemap/robots/OG metadata all follow.
 export const SITE_URL = "https://bookviphomes.com";
 export const SITE_NAME = "Book VIP Homes";
-export const CONTACT_EMAIL = "eddie@bookviphomes.com";
+export const CONTACT_EMAIL = "info@bookviphomes.com";
 
 // `request.nextUrl.origin` reflects whatever Host header the Node process
 // itself received — behind a reverse proxy that doesn't forward the

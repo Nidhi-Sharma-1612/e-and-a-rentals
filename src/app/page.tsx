@@ -17,7 +17,7 @@ export default async function Home() {
     getSiteSettings(),
     getCmsFaqs(),
   ]);
-  const email = settings?.email || "eddie@bookviphomes.com";
+  const email = settings?.email || "info@bookviphomes.com";
 
   return (
     <>
